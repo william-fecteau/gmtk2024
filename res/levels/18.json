@@ -1,0 +1,4 @@
+{
+  "nbBitsToOverflow": 8,
+  "cards": ["0", "exp(-256)", "ln", "-", "(", ")"]
+}
