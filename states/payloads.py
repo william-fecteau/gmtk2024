@@ -2,8 +2,9 @@ from typing import NamedTuple
 
 
 class InGameStatePayload(NamedTuple):
-    nbRows: int
-    nbColunms: int
-    nbAppleOnScreen: int
-    nbFrameBeforeNextInput: int
-    initialSnakeLength: int
+    world: int
+    level: int
+
+
+class LevelSelectPayload(NamedTuple):
+    pass

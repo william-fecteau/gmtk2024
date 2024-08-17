@@ -1,6 +1,6 @@
 from constants import TARGET_FPS
 from states.menuState import MenuState
-from .state import State
+from states.state import State
 from typing import NamedTuple
 from random import randint
 import pygame
