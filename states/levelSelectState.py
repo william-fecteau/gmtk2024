@@ -11,6 +11,9 @@ from utils import resource_path
 
 
 class LevelSelectState (State):
+    LEVEL_WORLD_0 = 1
+    LEVEL_WORLD_1 = 10
+    LEVEL_WORLD_2 = 10
 
     def __init__(self, game):
         super().__init__(game)
@@ -67,11 +70,23 @@ class LevelSelectState (State):
 
         compteur = 1
         for i in range(NB_WORLD):
-            self.menu.add.text_input("Monde " + str(i))
+            self.menu.add.label("World " + str(i))
+            maxValueWorld = self.getMaxLevelsWorld(i)
             for j in range(NB_LEVELS):
-                self.addButtonCalisse(i, j+1, compteur)
+                # TODO need to take into account level numbers per worlds
+                if(maxValueWorld-1 >= j):
+                    self.addButtonCalisse(i, j+1, compteur)
                 compteur += 1
 
+    def getMaxLevelsWorld(self, worldNumber: int) -> int:
+        if(worldNumber == 0):
+            return int(self.LEVEL_WORLD_0)
+        elif(worldNumber == 1):
+            return int(self.LEVEL_WORLD_1)
+        elif(worldNumber == 2):
+            return int(self.LEVEL_WORLD_2)
+        return 10
+    
     def setRow(self, value: int) -> None:
         self.rows = floor(value)
 
