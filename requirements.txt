@@ -3,3 +3,4 @@ pygame_menu
 numpy
 requests
 pyinstaller
+sympy
