@@ -11,6 +11,7 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.font.init()
+        pygame.display.set_caption("Overflow")
 
         self.screen = pygame.display.set_mode(SCREEN_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)
 

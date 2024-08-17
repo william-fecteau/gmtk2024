@@ -30,7 +30,8 @@ class CreditsState(State):
                 self.gamers.append(Gamer(len(self.gamers), self, gamerName))
 
     def onEnterState(self, payload: NamedTuple) -> None:
-        pass
+        for gamer in self.gamers:
+            gamer.UpdateRandoms()
     
     def update(self) -> None:
         for event in self.game.events:
@@ -46,17 +47,12 @@ class CreditsState(State):
         for gamer in self.gamers:
             gamer.Draw(screen)
 
-    def onExitState(self) -> None:
-        pass
-
 class Gamer:
     def __init__(self, id, state, name) -> None:
         self.id = id
         self.name = name
         self.state = state
         self.sprites = self.LoadSprites()
-        self.updateFrame = randint(0, TARGET_FPS - 1)
-        self.animationIndex = randint(0, len(self.sprites) - 1)
 
     def LoadSprites(self):
         spritesPrefix = self.name + "_"
@@ -73,6 +69,10 @@ class Gamer:
             spriteName = spritePath + str(spriteIndex) + ".png"
 
         return sprites
+
+    def UpdateRandoms(self):
+        self.updateFrame = randint(0, TARGET_FPS - 1)
+        self.animationIndex = randint(0, len(self.sprites) - 1)
 
     def Update(self, currentFrame):
         if (currentFrame % TARGET_FPS == self.updateFrame):
