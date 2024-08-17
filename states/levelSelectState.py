@@ -65,10 +65,12 @@ class LevelSelectState (State):
             '', width, height, theme=cool_theme, center_content=False, columns=NB_WORLD, rows=NB_LEVELS+1)
         self.menu.get_menubar().hide()
 
+        compteur = 1
         for i in range(NB_WORLD):
             self.menu.add.text_input("Monde " + str(i))
             for j in range(NB_LEVELS):
-                self.menu.add.button(NB_LEVELS, lambda: self.goToLevel(i, j))
+                self.menu.add.button("Level" + str(compteur), lambda: self.goToLevel(i, j+1))
+                compteur += 1
 
     def setRow(self, value: int) -> None:
         self.rows = floor(value)

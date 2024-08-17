@@ -118,7 +118,8 @@ class InGameState(State):
                 Card(value, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
 
     def onEnterState(self, payload: InGameStatePayload) -> None:
-        pathLevel = os.path.join(f"res/worlds/{payload.world}/{payload.level}.json")
+        pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
+        pathLevel = os.path.join(pathStr)
         self.level = load_level(pathLevel)
 
         self.selected_card: Card | None = None
