@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 import pygame
+import sympy.core.numbers as spnumbers
 
 from constants import DARK_GRAY, GREEN_COLOR
 from levels import Card, evaluate_solution, load_level
@@ -98,19 +99,23 @@ class InGameState(State):
         screen.blit(self.goal_text, self.goal_rect)
         screen.blit(self.desc_goal, self.desc_rect)
 
-        self.total_text = pygame.font.Font(None, 96).render(f'{self.total:,}', True, (255, 255, 255))
-        self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
-        self.total_rect.y = self.totalHeight
-        screen.blit(self.total_text, self.total_rect)
+        
 
 
         if self.current_answer is not None:
-            print(self.current_answer)
+            if isinstance(self.current_answer, spnumbers.Integer):
+                self.current_answer = int(self.current_answer)
+            if isinstance(self.current_answer, spnumbers.Float):
+                self.current_answer = float(self.current_answer)
+                          
+            self.total_text = pygame.font.Font(None, 96).render(f'{self.current_answer:,}', True, (255, 255, 255))
+            self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
+            self.total_rect.y = self.totalHeight
+            screen.blit(self.total_text, self.total_rect)
 
     def init_card_slots(self):
         self.card_slots: list[CardSlotUi] = []
         self.cards_ui: list[CardUi] = []
-        self.total = 456456456456
 
         self.goal_text = pygame.font.Font(None, 192).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
