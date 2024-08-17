@@ -36,7 +36,7 @@ class CardUi:
         self.surf = pygame.Surface((size, size))
         self.surf.fill((147, 147, 147))
 
-        text_surf = pygame.font.Font(None, 48).render(card, True, (0, 0, 0))
+        text_surf = pygame.font.Font(None, 48).render(card.value, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
 
