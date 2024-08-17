@@ -50,13 +50,13 @@ class Gamer:
         self.id = id
         self.name = name
         self.sprites = self.LoadSprites()
-        self.updateFrame = randint(0, TARGET_FPS)
+        self.updateFrame = randint(0, TARGET_FPS - 1)
         self.animationIndex = randint(0, len(self.sprites) - 1)
         self.screenSize = pygame.display.get_window_size()
 
     def LoadSprites(self):
+        spritesPrefix = self.name + "_"
         spritesDirectory = utils.resource_path(os.path.join("res", "credits"))
-        spritesPrefix =  self.name.lower() + "_"
         spritePath = os.path.join(spritesDirectory, spritesPrefix)
         sprites = []
 
