@@ -82,7 +82,7 @@ class InGameState(State):
         character_size = 40
         character_offset = 10
 
-        nb_characters = len(self.level.characters)
+        nb_characters = len(self.level.cards)
 
         slot_width = nb_characters * (slot_size + slot_offset)
         character_width = nb_characters * (character_size + character_offset)
@@ -91,11 +91,13 @@ class InGameState(State):
         start_character = np.array(self.game.screen.get_rect().center) - \
             np.array((character_width // 2, -character_size // 2 - 20))
 
-        for i, character in enumerate(self.level.characters):
+        for i, card in enumerate(self.level.cards):
+            value = card.value
+
             self.character_slots.append(CharacterSlot(
                 start_slot[0] + i * (slot_size + slot_offset), start_slot[1], slot_size))
             self.characters.append(
-                Character(character, start_character[0] + i * (character_size + character_offset), start_character[1], character_size))
+                Character(value, start_character[0] + i * (character_size + character_offset), start_character[1], character_size))
 
     def onEnterState(self, payload: InGameStatePayload) -> None:
         self.level = load_level("res/levels/1.json")

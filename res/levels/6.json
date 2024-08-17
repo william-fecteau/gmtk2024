@@ -1,6 +1,6 @@
 {
   "nbBitsToOverflow": 4,
-  "characters": [
+  "cards": [
     "1",
     "1",
     "1",
@@ -16,7 +16,5 @@
     "+",
     "+",
     "^"
-  ],
-  "minCharacters": 0,
-  "maxCharacters": 15
+  ]
 }
