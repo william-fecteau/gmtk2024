@@ -1,0 +1,22 @@
+{
+  "nbBitsToOverflow": 4,
+  "characters": [
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "(",
+    ")",
+    "(",
+    ")",
+    "+",
+    "+",
+    "+",
+    "+",
+    "^"
+  ],
+  "minCharacters": 0,
+  "maxCharacters": 15
+}

@@ -1,0 +1,6 @@
+{
+  "nbBitsToOverflow": 4,
+  "characters": ["2", "3", "4", "+", "*", "(", ")"],
+  "minCharacters": 0,
+  "maxCharacters": 7
+}
