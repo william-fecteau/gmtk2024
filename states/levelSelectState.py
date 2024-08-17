@@ -49,12 +49,10 @@ class LevelSelectState (State):
         self.menu.update(self.game.events)
 
     def goToLevel(self, world: int, level: int) -> None:
-        print("world : " + str(world) + " level : " + str(level))
         self.game.switchState(
             "InGameState", InGameStatePayload(world, level)
         )
     def addButtonCalisse(self, world: int, level:int, totalLevelCount: int) -> None:
-        print("world : " + str(world) + " level : " + str(level))
         self.menu.add.button("Level " + str(totalLevelCount), lambda: self.goToLevel(world, level))
 
     def setupMenu(self) -> None:
@@ -79,7 +77,8 @@ class LevelSelectState (State):
                 # TODO need to take into account level numbers per worlds
                 if(maxValueWorld-1 >= j):
                     self.addButtonCalisse(i, j+1, compteur)
-                compteur += 1
+                    compteur += 1
+                
 
     def getMaxLevelsWorld(self, worldNumber: int) -> int:
         if(worldNumber == 0):
