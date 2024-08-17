@@ -4,7 +4,9 @@ from typing import NamedTuple, Optional
 import pygame
 
 from constants import SCREEN_SIZE, TARGET_FPS
-from states import InGameState, MenuState
+from MainMenu.levelSelectState import LevelSelectState
+from MainMenu.menuState import MenuState
+from states import InGameState
 
 
 class Game:
@@ -17,7 +19,8 @@ class Game:
         # States
         self.dicStates = {
             InGameState.__name__: InGameState(self),
-            MenuState.__name__: MenuState(self)
+            MenuState.__name__: MenuState(self),
+            LevelSelectState.__name__: LevelSelectState(self)
         }
         self.curState = MenuState.__name__
         self.nextState = None
@@ -39,7 +42,7 @@ class Game:
                 self.dicStates[self.curState].onEnterState(self.nextStatePayload)
                 self.nextState = None
                 self.nextStatePayload = None
-
+            
             self.screen.fill('black')
 
             self.dicStates[self.curState].update()

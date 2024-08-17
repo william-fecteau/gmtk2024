@@ -1,10 +1,12 @@
 
+import os
+
 import numpy as np
 import pygame
 
 from constants import DARK_GRAY, GREEN_COLOR
 from levels import load_level
-from states.payloads import InGameStatePayload
+from states.payloads import LevelSelectPayload
 
 from .state import State
 
@@ -115,8 +117,12 @@ class InGameState(State):
             self.cards.append(
                 Card(value, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
 
-    def onEnterState(self, payload: InGameStatePayload) -> None:
-        self.level = load_level("res/levels/1.json")
+    def onEnterState(self, payload: LevelSelectPayload) -> None:
+        test = LevelSelectPayload.world.__int__
+        worldString = str(LevelSelectPayload.world.__int__)
+        levelString = str(LevelSelectPayload.level)
+        pathLevel = os.path.join("res/levels/", worldString, levelString, ".json")
+        self.level = load_level(pathLevel)
 
         self.selected_card: Card | None = None
         self.mouse_click_offset = (0, 0)

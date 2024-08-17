@@ -7,3 +7,7 @@ class InGameStatePayload(NamedTuple):
     nbAppleOnScreen: int
     nbFrameBeforeNextInput: int
     initialSnakeLength: int
+
+class LevelSelectPayload(NamedTuple):
+    world: int
+    level: int
