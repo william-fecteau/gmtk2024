@@ -19,12 +19,8 @@ class LevelSelectState (State):
         self.surf = pygame.Surface(SCREEN_SIZE)
         self.backgroundSnake = pygame.image.load(resource_path('./res/MenuImg/MenuBackground.png'))
         self.cool_snake = pygame.image.load(resource_path('./res/shnake.png'))
-        self.bigSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 72)
+        self.bigSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 64)
         self.smolSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 24)
-        self.rows = 17
-        self.columns = 17
-        self.appleSpawn = 1
-        self.delay = 6
 
         self.setupMenu()
 
@@ -56,7 +52,7 @@ class LevelSelectState (State):
 
         cool_theme = pygame_menu.themes.THEME_GREEN.copy()  # type: ignore
         cool_theme.background_color = BLACK
-        cool_theme.widget_font = self.bigSnakeFont
+        cool_theme.widget_font = self.smolSnakeFont
         cool_theme.widget_font_color = EMERALD
         cool_theme.selection_color = GREEN_COLOR
         cool_theme.widget_offset = (0, 200)
@@ -70,6 +66,8 @@ class LevelSelectState (State):
             self.menu.add.text_input("Monde " + str(i))
             for j in range(NB_LEVELS):
                 self.menu.add.button("Level" + str(compteur), lambda: self.goToLevel(i, j+1))
+                #button = self.menu.add.button("Level" + str(compteur), None)
+                #button.add_update_callback(self.goToLevel(i, j+1))
                 compteur += 1
 
     def setRow(self, value: int) -> None:
