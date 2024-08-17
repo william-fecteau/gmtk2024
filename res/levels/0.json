@@ -1,4 +1,23 @@
 {
   "nbBitsToOverflow": 1,
-  "cards": ["sin", "4", "!", "ln", "log"]
+  "cards": [
+    "+",
+    "-",
+    "*",
+    "/",
+    "!",
+    "(",
+    ")",
+    "^",
+    "exp",
+    "log",
+    "ln",
+    "sqrt",
+    "pi",
+    "abs",
+    "e",
+    "sin",
+    "cos",
+    "tan"
+  ]
 }
