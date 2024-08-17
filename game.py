@@ -5,6 +5,7 @@ import pygame
 
 from constants import SCREEN_SIZE, TARGET_FPS
 from states import InGameState, MenuState
+from states.creditsState import CreditsState
 
 
 class Game:
@@ -17,7 +18,8 @@ class Game:
         # States
         self.dicStates = {
             InGameState.__name__: InGameState(self),
-            MenuState.__name__: MenuState(self)
+            MenuState.__name__: MenuState(self),
+            CreditsState.__name__: CreditsState(self)
         }
         self.curState = MenuState.__name__
         self.nextState = None
