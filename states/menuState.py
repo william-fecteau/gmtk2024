@@ -56,6 +56,9 @@ class MenuState (State):
     def levelSelect(self) -> None:
         self.game.switchState("LevelSelectState")
 
+    def credits(self) -> None:
+        self.game.switchState("CreditsState")
+
     def setupMenu(self) -> None:
         width, height = SCREEN_SIZE
 
@@ -72,6 +75,7 @@ class MenuState (State):
 
         self.menu.add.button('Play', self.menuAction)
         self.menu.add.button('Level Select', self.levelSelect)
+        self.menu.add.button('Credits', self.credits)
         self.menu.add.button('Quit', pygame_menu.events.EXIT)  # type: ignore
 
     def setRow(self, value: int) -> None:
