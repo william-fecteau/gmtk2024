@@ -1,19 +1,23 @@
-from constants import TARGET_FPS
+from constants import GREEN_COLOR, TARGET_FPS
 from states.menuState import MenuState
+from utils import resource_path
 from states.state import State
 from typing import NamedTuple
 from random import randint
 import pygame
-import utils
 import os
 
 class CreditsState(State):
     def __init__(self, game):
         super().__init__(game)
+
+        fontRelativePath = os.path.join("res", "TTOctosquaresTrialRegular.ttf")
+        self.font = pygame.font.Font(resource_path(fontRelativePath), 40)
+        self.screenSize = pygame.display.get_window_size()
         self.currentFrame = 0
         self.gamers = []
 
-        gamersDirectoryPath = utils.resource_path(os.path.join("res", "credits"))
+        gamersDirectoryPath = resource_path(os.path.join("res", "credits"))
         gamersDirectory = os.fsencode(gamersDirectoryPath)
         gamerNames = []
     
@@ -23,7 +27,7 @@ class CreditsState(State):
 
             if (gamerName not in gamerNames):
                 gamerNames.append(gamerName)
-                self.gamers.append(Gamer(len(self.gamers), gamerName))
+                self.gamers.append(Gamer(len(self.gamers), self, gamerName))
 
     def onEnterState(self, payload: NamedTuple) -> None:
         pass
@@ -46,17 +50,17 @@ class CreditsState(State):
         pass
 
 class Gamer:
-    def __init__(self, id, name) -> None:
+    def __init__(self, id, state, name) -> None:
         self.id = id
         self.name = name
+        self.state = state
         self.sprites = self.LoadSprites()
         self.updateFrame = randint(0, TARGET_FPS - 1)
         self.animationIndex = randint(0, len(self.sprites) - 1)
-        self.screenSize = pygame.display.get_window_size()
 
     def LoadSprites(self):
         spritesPrefix = self.name + "_"
-        spritesDirectory = utils.resource_path(os.path.join("res", "credits"))
+        spritesDirectory = resource_path(os.path.join("res", "credits"))
         spritePath = os.path.join(spritesDirectory, spritesPrefix)
         sprites = []
 
@@ -75,8 +79,16 @@ class Gamer:
             self.animationIndex = (self.animationIndex + 1) % len(self.sprites) 
 
     def Draw(self, screen):
-        paddingTop = self.screenSize[1] / 32
+        posX = self.state.screenSize[0] / 3 * (self.id % 3)
+        posY = self.state.screenSize[1] / 4 * (self.id // 3)
+        self.DrawLogo(screen, posX, posY)
+        self.DrawName(screen, posX, posY)
+
+    def DrawLogo(self, screen, posX, posY):
+        paddingTop = self.state.screenSize[1] / 32
         currentSprite = self.sprites[self.animationIndex]
-        posX = self.screenSize[0] / 3 * (self.id % 3) + 30
-        posY = self.screenSize[1] / 4 * (self.id // 3) + paddingTop
-        screen.blit(currentSprite, pygame.Rect(posX, posY, 128, 128))
+        screen.blit(currentSprite, pygame.Rect(posX + 30, posY + paddingTop, 128, 128))
+
+    def DrawName(self, screen, posX, posY):
+        position = (posX + 175, posY + self.state.screenSize[1] / 32 + 45)
+        screen.blit(self.state.font.render(self.name, True, GREEN_COLOR), position)
