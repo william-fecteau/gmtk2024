@@ -57,14 +57,12 @@ class InGameState(State):
                     if character.rect.collidepoint(mouse_pos):
                         self.selected_character = character
                         self.mouse_click_offset = np.array(mouse_pos) - np.array(character.rect.topleft)
-                        print("Selected charcter")
                         break
         else:
             self.selected_character = None
 
         if self.selected_character is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
-            print(offset_pos)
             self.selected_character.move(offset_pos)  # type: ignore
 
     def draw(self, screen) -> None:
