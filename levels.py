@@ -71,9 +71,7 @@ def load_level(level_path: str) -> Level:
 
 def solution_preprocess(solution: list[Card]) -> list[Card]:
     # Sympy preprocess
-    for i in range(len(solution)):
-        card = solution[i]
-
+    for card in solution:
         if card.value == 'e':
             card.value = 'E'
 
@@ -86,6 +84,7 @@ def solution_preprocess(solution: list[Card]) -> list[Card]:
 
         if i >= len(solution) - 1:
             processed_solution.append(card)
+            i += 1
             continue
 
         if card.value == 'sqrt':
