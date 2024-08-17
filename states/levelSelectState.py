@@ -40,24 +40,15 @@ class LevelSelectState (State):
 
         posMaintext = (float(screen.get_width()/4), float(50))
         self.surf.blit(self.bigSnakeFont.render("Level Selection", True, GREEN_COLOR), posMaintext)
-        
 
         screen.blit(self.surf, (0, 0))
 
     def update(self) -> None:
         self.menu.update(self.game.events)
 
-    def menuAction(self) -> None:
+    def goToLevel(self, world: int, level: int) -> None:
         self.game.switchState(
-            "InGameState", InGameStatePayload(self.rows, self.columns, self.appleSpawn, self.delay, 2))
-        
-    def levelSelect(self) -> None:
-        self.game.switchState(
-            "InGameState", InGameStatePayload(self.rows, self.columns, self.appleSpawn, self.delay, 2))
-        
-    def goToLevel(self) -> None:
-        self.game.switchState(
-            "InGameState", InGameStatePayload(self.rows, self.columns, self.appleSpawn, self.delay, 2)
+            "InGameState", InGameStatePayload(world, level)
         )
 
     def setupMenu(self) -> None:
@@ -70,8 +61,6 @@ class LevelSelectState (State):
         cool_theme.selection_color = GREEN_COLOR
         cool_theme.widget_offset = (0, 200)
 
-
-        
         self.menu = pygame_menu.Menu(
             '', width, height, theme=cool_theme, center_content=False, columns=NB_WORLD, rows=NB_LEVELS+1)
         self.menu.get_menubar().hide()
@@ -79,11 +68,7 @@ class LevelSelectState (State):
         for i in range(NB_WORLD):
             self.menu.add.text_input("Monde " + str(i))
             for j in range(NB_LEVELS):
-                self.menu.add.button(NB_LEVELS, self.goToLevel)
-
-        #self.menu.add.button('Play', self.menuAction)
-        #self.menu.add.button('Level Select', self.menuAction)
-        #self.menu.add.button('Quit', pygame_menu.events.EXIT)  # type: ignore
+                self.menu.add.button(NB_LEVELS, lambda: self.goToLevel(i, j))
 
     def setRow(self, value: int) -> None:
         self.rows = floor(value)
