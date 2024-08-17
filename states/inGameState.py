@@ -33,15 +33,14 @@ class CardSlotUi:
         return False
 
 
-
-
 class CardUi:
     def __init__(self, card: Card, x: int, y: int, size: int):
         self.card = card
 
         self.surf = pygame.Surface((size, size))
         self.surf.fill((147, 147, 147))
-        text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 48).render(card.value, True, (0, 0, 0))
+        text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                     48).render(card.value, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
 
@@ -101,16 +100,15 @@ class InGameState(State):
         screen.blit(self.goal_text, self.goal_rect)
         screen.blit(self.desc_goal, self.desc_rect)
 
-        
-
-
+        parsed_answer = "???"
         if self.current_answer is not None:
             if isinstance(self.current_answer, spnumbers.Integer):
-                self.total = int(self.current_answer)
-            if isinstance(self.current_answer, spnumbers.Float):
-                self.total = float(self.current_answer)
-                          
-        self.total_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 80).render(f'{self.total:,}', True, (255, 255, 255))
+                parsed_answer = f'{self.current_answer:,}'
+            else:
+                parsed_answer = f'{self.current_answer:.2f}'
+
+        self.total_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                           80).render(parsed_answer, True, (255, 255, 255))
         self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
         self.total_rect.y = self.totalHeight
         screen.blit(self.total_text, self.total_rect)
@@ -118,13 +116,14 @@ class InGameState(State):
     def init_card_slots(self):
         self.card_slots: list[CardSlotUi] = []
         self.cards_ui: list[CardUi] = []
-        self.total = 0
 
-        self.goal_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
+        self.goal_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                          128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
         self.goal_rect.y = 1/15 * self.game.screen.get_rect().h
 
-        self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 64).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
+        self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                          64).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
         self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
         self.desc_rect.y = 1/4 * self.game.screen.get_rect().h
 
@@ -150,7 +149,7 @@ class InGameState(State):
                 CardUi(card, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
 
         self.totalHeight = self.card_slots[-1].rect.bottom
-            
+
     def getAnswer(self) -> float | None:
         solutions: list[Card] = []
         for slot in self.card_slots:

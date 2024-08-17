@@ -1,6 +1,7 @@
 import json
 from dataclasses import dataclass
 
+import sympy
 from sympy import sympify
 
 VALID_CARD_VALUES = ['+', '-', '*', '/', '!', '(', ')', '^', 'exp', 'log',
@@ -86,8 +87,16 @@ def validate_solution(level: Level, solution: list[Card]) -> bool:
 
     # Check that we don't have two consecutive numerics
     for i in range(len(solution) - 1):
-        if is_float(solution[i].value) and is_float(solution[i + 1].value):
+        a = solution[i].value
+        b = solution[i + 1].value
+
+        # This is to prevent two consecutive numerics which would lead to 1,1 => 11
+        if is_float(a) and is_float(b):
             print(f'Two consecutive numerics found in solution: {solution[i].value}, {solution[i + 1].value}')
+            return False
+        # This is to prevent integer division
+        if a == '/' and b == '/':
+            print(f'Two consecutive division found in solution: {solution[i].value}, {solution[i + 1].value}')
             return False
 
     return True
@@ -153,9 +162,12 @@ def evaluate_solution(level: Level, solution: list[Card]) -> float:
 
     expression = ''.join([card.value for card in preprocessed_solution])
     try:
-        value = sympify(expression)
+        value = sympify(expression).evalf()
     except:
         raise ValueError(f'Sympy evaluation failed for expression: {expression}')
+
+    if value == sympy.zoo:
+        raise ValueError('Division by zero')
 
     return value
 
