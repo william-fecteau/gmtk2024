@@ -36,7 +36,7 @@ class Card:
         self.surf = pygame.Surface((size, size))
         self.surf.fill((147, 147, 147))
 
-        text_surf = pygame.font.Font(None, 32).render(card, True, (0, 0, 0))
+        text_surf = pygame.font.Font(None, 48).render(card, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
 
@@ -91,15 +91,33 @@ class InGameState(State):
         for card in self.cards:
             card.draw(screen)
 
+        screen.blit(self.goal_text, self.goal_rect)
+        screen.blit(self.desc_goal, self.desc_rect)
+
+        self.total_text = pygame.font.Font(None, 96).render(f'{self.total:,}', True, (255, 255, 255))
+        self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
+        self.total_rect.y = self.totalHeight
+        screen.blit(self.total_text, self.total_rect)
+
+
     def init_card_slots(self):
         self.card_slots: list[CardSlot] = []
         self.cards: list[Card] = []
+        self.total = 456456456456
 
-        slot_size = 60
-        slot_offset = 10
+        self.goal_text = pygame.font.Font(None, 192).render(f'{(2 ** self.level.nbBitsToOverflow) - 1:,}', True, (255, 255, 255))
+        self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
+        self.goal_rect.y = 1/15 * self.game.screen.get_rect().h
 
-        card_size = 40
-        card_offset = 10
+        self.desc_goal = pygame.font.Font(None, 64).render(str(self.level.nbBitsToOverflow) + '-bit Integer', True, (255, 255, 255))
+        self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
+        self.desc_rect.y = 1/4 * self.game.screen.get_rect().h
+
+        slot_size = 100
+        slot_offset = 20
+
+        card_size = 80
+        card_offset = 20
 
         nb_cards = len(self.level.cards)
 
@@ -117,6 +135,8 @@ class InGameState(State):
                 start_slot[0] + i * (slot_size + slot_offset), start_slot[1], slot_size))
             self.cards.append(
                 Card(value, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
+        
+        self.totalHeight = self.card_slots[-1].rect.bottom + 20
             
     def getAnswer(self) -> list[Card]:
         cards: list[Card] = []
