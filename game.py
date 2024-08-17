@@ -4,7 +4,7 @@ from typing import NamedTuple, Optional
 import pygame
 
 from constants import SCREEN_SIZE, TARGET_FPS
-from states import InGameState, MenuState
+from states import InGameState, LevelSelectState, MenuState
 
 
 class Game:
@@ -17,7 +17,8 @@ class Game:
         # States
         self.dicStates = {
             InGameState.__name__: InGameState(self),
-            MenuState.__name__: MenuState(self)
+            MenuState.__name__: MenuState(self),
+            LevelSelectState.__name__: LevelSelectState(self)
         }
         self.curState = MenuState.__name__
         self.nextState = None

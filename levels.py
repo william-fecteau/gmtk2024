@@ -152,7 +152,6 @@ def evaluate_solution(level: Level, solution: list[Card]) -> float:
     preprocessed_solution = preprocess_solution(solution)
 
     expression = ''.join([card.value for card in preprocessed_solution])
-    print(f'Evaluated expression {expression}')
     try:
         value = sympify(expression)
     except:
