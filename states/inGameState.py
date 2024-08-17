@@ -50,6 +50,12 @@ class CardUi:
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.surf, self.rect.topleft)
+    
+    def saveInitialPos(self, pos: tuple[int, int]) ->None:
+        self.initPos = pos
+    
+    def setComebackPosition(self, pos: tuple[int, int]):
+        self.rect.topleft = pos
 
 
 class InGameState(State):
@@ -69,10 +75,13 @@ class InGameState(State):
                 for card_ui in self.cards_ui:
                     if card_ui.rect.collidepoint(mouse_pos):
                         self.selected_card = card_ui
+                        self.selected_card.saveInitialPos(card_ui.rect.topleft)
                         self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                         break
         else:
-            self.selected_card = None
+            if self.selected_card != None:
+                self.selected_card.setComebackPosition(self.selected_card.initPos)
+                self.selected_card = None
             for slot in self.card_slots:
                 for card_ui in self.cards_ui:
                     if slot.cardInside(card_ui):
