@@ -78,7 +78,7 @@ def is_solution_valid(level: Level, solution: list[str]) -> tuple[bool, float]:
 
 
 if __name__ == '__main__':
-    level = load_level('res/levels/1.json')
+    level = load_level('res/levels/4.json')
 
     print(f'Number to overflow: {2**level.nbBitsToOverflow-1}')
     print(f'Characters: {level.characters}')
