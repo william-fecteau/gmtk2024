@@ -1,4 +1,6 @@
 
+import os
+
 import numpy as np
 import pygame
 
@@ -155,7 +157,9 @@ class InGameState(State):
         return value
 
     def onEnterState(self, payload: InGameStatePayload) -> None:
-        self.level = load_level("res/levels/1.json")
+        pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
+        pathLevel = os.path.join(pathStr)
+        self.level = load_level(pathLevel)
 
         self.current_answer: float | None = None
         self.selected_card: CardUi | None = None
