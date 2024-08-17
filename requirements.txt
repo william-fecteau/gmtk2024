@@ -2,5 +2,6 @@ pygame
 pygame_menu
 numpy
 requests
+sympy
 pyinstaller
 sympy

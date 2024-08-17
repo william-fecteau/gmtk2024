@@ -2,6 +2,7 @@
 import numpy as np
 import pygame
 
+from constants import DARK_GRAY, GREEN_COLOR
 from levels import load_level
 from states.payloads import InGameStatePayload
 
@@ -17,6 +18,14 @@ class CharacterSlot:
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.surf, self.rect.topleft)
+
+    def setColor(self, color):
+        self.surf.fill(color)
+
+    def characterInside(self, character):
+        if self.rect.contains(character.rect):
+            return True
+        return False
 
 
 class Character:
@@ -60,6 +69,13 @@ class InGameState(State):
                         break
         else:
             self.selected_character = None
+            for slot in self.character_slots:
+                for character in self.characters:
+                    if slot.characterInside(character):
+                        slot.setColor(GREEN_COLOR)
+                        break
+                    else:
+                        slot.setColor(DARK_GRAY)
 
         if self.selected_character is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
