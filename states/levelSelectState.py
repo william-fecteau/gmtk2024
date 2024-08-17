@@ -19,8 +19,8 @@ class LevelSelectState (State):
         self.surf = pygame.Surface(SCREEN_SIZE)
         self.backgroundSnake = pygame.image.load(resource_path('./res/MenuImg/MenuBackground.png'))
         self.cool_snake = pygame.image.load(resource_path('./res/shnake.png'))
-        self.bigSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 64)
-        self.smolSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 24)
+        self.bigSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 64)
+        self.smolSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
 
         self.setupMenu()
 
@@ -49,7 +49,7 @@ class LevelSelectState (State):
         )
     def addButtonCalisse(self, world: int, level:int, totalLevelCount: int) -> None:
         print("world : " + str(world) + " level : " + str(level))
-        self.menu.add.button("Level" + str(totalLevelCount), lambda: self.goToLevel(world, level))
+        self.menu.add.button("Level " + str(totalLevelCount), lambda: self.goToLevel(world, level))
 
     def setupMenu(self) -> None:
         width, height = SCREEN_SIZE
