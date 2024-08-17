@@ -3,17 +3,17 @@ import numpy as np
 import pygame
 
 from constants import DARK_GRAY, GREEN_COLOR
-from levels import load_level
+from levels import Card, evaluate_solution, load_level
 from states.payloads import InGameStatePayload
 
 from .state import State
 
 
-class CardSlot:
+class CardSlotUi:
     def __init__(self, x: int, y: int, size: int):
         self.surf = pygame.Surface((size, size))
         self.surf.fill(DARK_GRAY)
-        self.card : Card | None = None
+        self.card: Card | None = None
 
         self.rect = pygame.Rect(x, y, size, size)
 
@@ -29,8 +29,8 @@ class CardSlot:
         return False
 
 
-class Card:
-    def __init__(self, card: str, x: int, y: int, size: int):
+class CardUi:
+    def __init__(self, card: Card, x: int, y: int, size: int):
         self.card = card
 
         self.surf = pygame.Surface((size, size))
@@ -63,22 +63,24 @@ class InGameState(State):
         mouse_pos = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]:
             if self.selected_card is None:
-                for card in self.cards:
-                    if card.rect.collidepoint(mouse_pos):
-                        self.selected_card = card
-                        self.mouse_click_offset = np.array(mouse_pos) - np.array(card.rect.topleft)
+                for card_ui in self.cards_ui:
+                    if card_ui.rect.collidepoint(mouse_pos):
+                        self.selected_card = card_ui
+                        self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                         break
         else:
             self.selected_card = None
             for slot in self.card_slots:
-                for card in self.cards:
-                    if slot.cardInside(card):
+                for card_ui in self.cards_ui:
+                    if slot.cardInside(card_ui):
                         slot.setColor(GREEN_COLOR)
-                        slot.card = card
+                        slot.card = card_ui.card
                         break
                     else:
                         slot.setColor(DARK_GRAY)
                         slot.card = None
+
+            self.current_answer = self.getAnswer()
 
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
@@ -88,7 +90,7 @@ class InGameState(State):
         for card_slot in self.card_slots:
             card_slot.draw(screen)
 
-        for card in self.cards:
+        for card in self.cards_ui:
             card.draw(screen)
 
         screen.blit(self.goal_text, self.goal_rect)
@@ -100,9 +102,12 @@ class InGameState(State):
         screen.blit(self.total_text, self.total_rect)
 
 
+        if self.current_answer is not None:
+            print(self.current_answer)
+
     def init_card_slots(self):
-        self.card_slots: list[CardSlot] = []
-        self.cards: list[Card] = []
+        self.card_slots: list[CardSlotUi] = []
+        self.cards_ui: list[CardUi] = []
         self.total = 456456456456
 
         self.goal_text = pygame.font.Font(None, 192).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
@@ -129,27 +134,31 @@ class InGameState(State):
             np.array((card_width // 2, -card_size // 2 - 20))
 
         for i, card in enumerate(self.level.cards):
-            value = card.value
-
-            self.card_slots.append(CardSlot(
+            self.card_slots.append(CardSlotUi(
                 start_slot[0] + i * (slot_size + slot_offset), start_slot[1], slot_size))
-            self.cards.append(
-                Card(value, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
-        
+            self.cards_ui.append(
+                CardUi(card, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
+
         self.totalHeight = self.card_slots[-1].rect.bottom + 20
             
-    def getAnswer(self) -> list[Card]:
-        cards: list[Card] = []
+    def getAnswer(self) -> float | None:
+        solutions: list[Card] = []
         for slot in self.card_slots:
             if slot.card is not None:
-                cards.append(slot.card)
+                solutions.append(slot.card)
 
-        return cards
+        try:
+            value = evaluate_solution(self.level, solutions)  # type: ignore
+        except:
+            return None
+
+        return value
 
     def onEnterState(self, payload: InGameStatePayload) -> None:
         self.level = load_level("res/levels/1.json")
 
-        self.selected_card: Card | None = None
+        self.current_answer: float | None = None
+        self.selected_card: CardUi | None = None
         self.mouse_click_offset = (0, 0)
         self.init_card_slots()
 
