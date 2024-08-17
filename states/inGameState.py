@@ -105,11 +105,11 @@ class InGameState(State):
         self.cards: list[Card] = []
         self.total = 456456456456
 
-        self.goal_text = pygame.font.Font(None, 192).render(f'{(2 ** self.level.nbBitsToOverflow) - 1:,}', True, (255, 255, 255))
+        self.goal_text = pygame.font.Font(None, 192).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
         self.goal_rect.y = 1/15 * self.game.screen.get_rect().h
 
-        self.desc_goal = pygame.font.Font(None, 64).render(str(self.level.nbBitsToOverflow) + '-bit Integer', True, (255, 255, 255))
+        self.desc_goal = pygame.font.Font(None, 64).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
         self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
         self.desc_rect.y = 1/4 * self.game.screen.get_rect().h
 
