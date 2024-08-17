@@ -1,16 +1,45 @@
 
+import numpy as np
 import pygame
 
-from constants import SCREEN_SIZE
-from grid import Grid
+from levels import load_level
 from states.payloads import InGameStatePayload
 
 from .state import State
 
 
-class InGameState(State):
-    CELL_SIZE = 32
+class CharacterSlot:
+    def __init__(self, x: int, y: int, size: int):
+        self.surf = pygame.Surface((size, size))
+        self.surf.fill((46, 46, 46))
 
+        self.rect = pygame.Rect(x, y, size, size)
+
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.surf, self.rect.topleft)
+
+
+class Character:
+    def __init__(self, character: str, x: int, y: int, size: int):
+        self.character = character
+
+        self.surf = pygame.Surface((size, size))
+        self.surf.fill((147, 147, 147))
+
+        text_surf = pygame.font.Font(None, 32).render(character, True, (0, 0, 0))
+        text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
+        self.surf.blit(text_surf, text_rect)
+
+        self.rect = pygame.Rect(x, y, size, size)
+
+    def move(self, pos: tuple[int, int]):
+        self.rect.topleft = pos
+
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.surf, self.rect.topleft)
+
+
+class InGameState(State):
     def __init__(self, game):
         super().__init__(game)
 
@@ -19,60 +48,63 @@ class InGameState(State):
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.game.switchState("MenuState")
 
-        self.curFrame += 1
+        self.last_mouse_move = pygame.mouse.get_rel()
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] and self.lastDir[0] != 1:
-            self.grid.direction = (-1, 0)
-        elif keys[pygame.K_DOWN] and self.lastDir[0] != -1:
-            self.grid.direction = (1, 0)
-        elif keys[pygame.K_RIGHT] and self.lastDir[1] != -1:
-            self.grid.direction = (0, 1)
-        elif keys[pygame.K_LEFT] and self.lastDir[1] != 1:
-            self.grid.direction = (0, -1)
+        mouse_pos = pygame.mouse.get_pos()
+        if pygame.mouse.get_pressed()[0]:
+            if self.selected_character is None:
+                for character in self.characters:
+                    if character.rect.collidepoint(mouse_pos):
+                        self.selected_character = character
+                        self.mouse_click_offset = np.array(mouse_pos) - np.array(character.rect.topleft)
+                        print("Selected charcter")
+                        break
+        else:
+            self.selected_character = None
 
-        if self.curFrame % self.nbFrameBeforeNextInput == 0:
-            self.grid.update()
-
-            if self.grid.isDead:
-                self.game.switchState("MenuState")
-
-            self.lastDir = self.grid.direction
+        if self.selected_character is not None:
+            offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
+            print(offset_pos)
+            self.selected_character.move(offset_pos)  # type: ignore
 
     def draw(self, screen) -> None:
-        board = pygame.Surface((self.grid.nbColumns * self.CELL_SIZE, self.grid.nbRows * self.CELL_SIZE))
-        boardRect = board.get_rect()
-        tile = pygame.Surface((InGameState.CELL_SIZE, InGameState.CELL_SIZE))
+        for character_slot in self.character_slots:
+            character_slot.draw(screen)
 
-        for i in range(self.grid.nbRows):
-            for j in range(self.grid.nbColumns):
-                if self.grid.grid[i, j] == Grid.EMPTY:
-                    variant = True
-                    if i % 2 == 0:
-                        variant = not variant
-                    if j % 2 == 0:
-                        variant = not variant
+        for character in self.characters:
+            character.draw(screen)
 
-                    if variant:
-                        tile.fill((48, 48, 48))
-                    else:
-                        tile.fill((36, 36, 36))
-                elif self.grid.grid[i, j] == Grid.HEAD or self.grid.grid[i, j] == Grid.BODY:
-                    tile.fill("green")
-                elif self.grid.grid[i, j] == Grid.WALL:
-                    tile.fill("black")
-                elif self.grid.grid[i, j] == Grid.APPLE:
-                    tile.fill("red")
+    def init_character_slots(self):
+        self.character_slots: list[CharacterSlot] = []
+        self.characters: list[Character] = []
 
-                board.blit(tile, (j * InGameState.CELL_SIZE, i * InGameState.CELL_SIZE))
+        slot_size = 60
+        slot_offset = 10
 
-        boardRect.center = (SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2)
-        screen.blit(board, boardRect)
+        character_size = 40
+        character_offset = 10
+
+        nb_characters = len(self.level.characters)
+
+        slot_width = nb_characters * (slot_size + slot_offset)
+        character_width = nb_characters * (character_size + character_offset)
+
+        start_slot = np.array(self.game.screen.get_rect().center) - np.array((slot_width // 2, slot_size // 2))
+        start_character = np.array(self.game.screen.get_rect().center) - \
+            np.array((character_width // 2, -character_size // 2 - 20))
+
+        for i, character in enumerate(self.level.characters):
+            self.character_slots.append(CharacterSlot(
+                start_slot[0] + i * (slot_size + slot_offset), start_slot[1], slot_size))
+            self.characters.append(
+                Character(character, start_character[0] + i * (character_size + character_offset), start_character[1], character_size))
 
     def onEnterState(self, payload: InGameStatePayload) -> None:
-        self.grid = Grid(payload.nbRows + 2, payload.nbColunms + 2, payload.nbAppleOnScreen, payload.initialSnakeLength)
-        self.nbFrameBeforeNextInput = payload.nbFrameBeforeNextInput
-        self.curFrame = 0
+        self.level = load_level("res/levels/1.json")
+
+        self.selected_character: Character | None = None
+        self.mouse_click_offset = (0, 0)
+        self.init_character_slots()
 
     def onExitState(self) -> None:
         pass

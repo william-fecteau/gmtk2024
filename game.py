@@ -3,7 +3,7 @@ from typing import NamedTuple, Optional
 
 import pygame
 
-from constants import BG_COLOR, SCREEN_SIZE, TARGET_FPS
+from constants import SCREEN_SIZE, TARGET_FPS
 from states import InGameState, MenuState
 
 
@@ -40,7 +40,7 @@ class Game:
                 self.nextState = None
                 self.nextStatePayload = None
 
-            self.screen.fill(BG_COLOR)
+            self.screen.fill('black')
 
             self.dicStates[self.curState].update()
             self.dicStates[self.curState].draw(self.screen)
