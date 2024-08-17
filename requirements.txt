@@ -1,0 +1,5 @@
+pygame
+pygame_menu
+numpy
+requests
+pyinstaller
