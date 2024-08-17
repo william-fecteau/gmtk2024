@@ -15,6 +15,14 @@ class Level:
     maxCharacters: int
 
 
+def is_float(string):
+    try:
+        float(eval(string))
+        return True
+    except:
+        return False
+
+
 def load_level(level_path: str) -> Level:
     with open(level_path) as f:
         level_json = json.load(f)
@@ -30,7 +38,7 @@ def load_level(level_path: str) -> Level:
 
         characters = level_json['characters']
         for character in characters:
-            if not character.isnumeric() and not character in VALID_CHARACTERS:
+            if not is_float(character) and not character in VALID_CHARACTERS:
                 raise ValueError(f'Invalid character found for level {level_path}: {character}')
 
         minCharacters = 0
