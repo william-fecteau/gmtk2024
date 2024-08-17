@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from sympy import sympify
 
 VALID_CARD_VALUES = ['+', '-', '*', '/', '!', '(', ')', '^', 'exp', 'log',
-                     'ln', 'sqrt', 'pi', 'abs', 'e', 'sin', 'cos', 'tan', 'i']
+                     'ln', 'sqrt', 'pi', 'abs', 'e', 'sin', 'cos', 'tan']
 
 
 @dataclass
@@ -69,6 +69,57 @@ def load_level(level_path: str) -> Level:
     return level
 
 
+def solution_preprocess(solution: list[Card]) -> list[Card]:
+    # Sympy preprocess
+    for i in range(len(solution)):
+        card = solution[i]
+
+        if card.value == 'e':
+            card.value = 'E'
+
+    # For cards that are functions, assume next card is the argument LGTM for now
+    # e.g. 'sqrt' -> 'sqrt(' + next_card + ')'
+    processed_solution = []
+    i = 0
+    while i < len(solution):
+        card = solution[i]
+
+        if i >= len(solution) - 1:
+            processed_solution.append(card)
+            continue
+
+        if card.value == 'sqrt':
+            card.value = 'sqrt('
+        elif card.value == 'exp':
+            card.value = 'exp('
+        elif card.value == 'log':
+            card.value = 'log(10,'
+        elif card.value == 'ln':
+            card.value = 'ln('
+        elif card.value == 'abs':
+            card.value = 'abs('
+        elif card.value == 'sin':
+            card.value = 'sin('
+        elif card.value == 'cos':
+            card.value = 'cos('
+        elif card.value == 'tan':
+            card.value = 'tan('
+        else:
+            processed_solution.append(card)
+            i += 1
+            continue
+
+        next_card = solution[i + 1]
+
+        processed_solution.append(card)
+        processed_solution.append(next_card)
+        processed_solution.append(Card(')'))
+
+        i += 2
+
+    return processed_solution
+
+
 def evaluate_solution(level: Level, solution: list[Card]) -> float:
     # Validate length of expression
     if len(solution) < level.minCards or len(solution) > level.maxCards:
@@ -82,7 +133,10 @@ def evaluate_solution(level: Level, solution: list[Card]) -> float:
 
         solution_cards.remove(card.value)
 
-    expression = ''.join([card.value for card in solution])
+    # Preprocess solution
+    preprocessed_solution = solution_preprocess(solution)
+
+    expression = ''.join([card.value for card in preprocessed_solution])
     print(expression)
     try:
         value = sympify(expression)
@@ -105,7 +159,7 @@ if __name__ == '__main__':
 
     running = True
     while running:
-        solution_str = input('Enter your solution witch each card separated by a comma : ')
+        solution_str = input('Enter your solution with each card separated by a comma : ')
 
         card_values = solution_str.replace(' ', '').split(',')
         cards = [Card(value) for value in card_values]
@@ -118,6 +172,6 @@ if __name__ == '__main__':
 
         print(f'Result is: {value}')
 
-        running = False
+        running = value <= 2**level.nbBitsToOverflow-1
 
     print('You did it, gg!')
