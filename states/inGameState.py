@@ -46,6 +46,8 @@ class CardUi:
 
         self.rect = pygame.Rect(x, y, size, size)
 
+        self.needUpdate = False
+
     def move(self, pos: tuple[int, int]):
         self.rect.topleft = pos
 
@@ -56,7 +58,16 @@ class CardUi:
         self.initPos = pos
     
     def setComebackPosition(self, pos: tuple[int, int]):
-        self.rect.topleft = pos
+        #self.rect.topleft = pos
+        self.needUpdate = True
+        print(self.rect.topleft[0])
+
+    def moveToInitPost(self):
+        if(self.rect.topleft[0] != self.initPos[0]):
+            newX = self.rect.topleft[0] -10
+            newY = self.rect.topright[1]
+            self.rect.topleft = (newX, newY)
+        print("a")
 
 
 class InGameState(State):
@@ -92,9 +103,7 @@ class InGameState(State):
                     else:
                         slot.setColor(DARK_GRAY)
                         slot.card = None
-
             self.current_answer = self.getAnswer()
-
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore

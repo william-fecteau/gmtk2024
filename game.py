@@ -4,7 +4,8 @@ from typing import NamedTuple, Optional
 import pygame
 
 from constants import SCREEN_SIZE, TARGET_FPS
-from states import InGameState, LevelSelectState, MenuState, CreditsState
+from states import CreditsState, InGameState, LevelSelectState, MenuState
+
 
 class Game:
     def __init__(self):
