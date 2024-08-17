@@ -43,6 +43,9 @@ class LevelSelectState (State):
         screen.blit(self.surf, (0, 0))
 
     def update(self) -> None:
+        for event in self.game.events:
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                self.game.switchState("MenuState")
         self.menu.update(self.game.events)
 
     def goToLevel(self, world: int, level: int) -> None:
