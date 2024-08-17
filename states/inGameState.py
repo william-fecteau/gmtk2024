@@ -12,17 +12,18 @@ from .state import State
 class CardSlot:
     def __init__(self, x: int, y: int, size: int):
         self.surf = pygame.Surface((size, size))
-        self.surf.fill((46, 46, 46))
+        self.surf.fill(DARK_GRAY)
+        self.card : Card | None = None
 
         self.rect = pygame.Rect(x, y, size, size)
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.surf, self.rect.topleft)
 
-    def setColor(self, color):
+    def setColor(self, color: tuple) -> None:
         self.surf.fill(color)
 
-    def cardInside(self, card):
+    def cardInside(self, card) -> bool:
         if self.rect.contains(card.rect):
             return True
         return False
@@ -73,9 +74,11 @@ class InGameState(State):
                 for card in self.cards:
                     if slot.cardInside(card):
                         slot.setColor(GREEN_COLOR)
+                        slot.card = card
                         break
                     else:
                         slot.setColor(DARK_GRAY)
+                        slot.card = None
 
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
@@ -114,6 +117,14 @@ class InGameState(State):
                 start_slot[0] + i * (slot_size + slot_offset), start_slot[1], slot_size))
             self.cards.append(
                 Card(value, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
+            
+    def getAnswer(self) -> list[Card]:
+        cards: list[Card] = []
+        for slot in self.card_slots:
+            if slot.card is not None:
+                cards.append(slot.card)
+
+        return cards
 
     def onEnterState(self, payload: InGameStatePayload) -> None:
         self.level = load_level("res/levels/1.json")
