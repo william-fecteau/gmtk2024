@@ -1,15 +1,20 @@
 import os
+
 import numpy as np
 import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
-from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHTER_GRAY, SCREEN_SIZE, WORLD_COLOR
+
+from constants import (BLACK, DARK_GRAY, GREEN_COLOR, LIGHTER_GRAY,
+                       SCREEN_SIZE, WORLD_COLOR)
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
 from states.payloads import InGameStatePayload
 from utils import get_max_levels_per_world, get_max_worlds, resource_path
+
 from .state import State
+
 
 class HelpUi:
     def __init__(self, help_text: str):
@@ -30,8 +35,8 @@ class HelpUi:
         textLines = help_text.split("\n")
 
         for i in range(0, len(textLines)):
-            textSurface : pygame.Surface = font_smoll.render(textLines[i], True, BLACK)
-            textPosition = textSurface.get_rect(center = self.surf.get_rect().center).move(0, (i - 1) * 25)
+            textSurface: pygame.Surface = font_smoll.render(textLines[i], True, BLACK)
+            textPosition = textSurface.get_rect(center=self.surf.get_rect().center).move(0, (i - 1) * 25)
             self.surf.blit(textSurface, textPosition)
 
     def draw(self, screen: pygame.Surface):
@@ -180,12 +185,12 @@ class CardUi:
 
 class SandUi:
     def __init__(self, currentWorld: int):
-        color = 0,0,0
+        color = 0, 0, 0
         colorStr = "WORLD_" + str(currentWorld) + "_COLOR"
         try:
             color = WORLD_COLOR.get(colorStr)
         except:
-            color = 0,0,0
+            color = 0, 0, 0
 
         self.sim = SandSimulator(color)
 
@@ -467,6 +472,7 @@ class InGameState(State):
         self.current_level = payload.level
         self.level = load_level(pathLevel)
 
+        self.tutorial_ui = None
         if self.current_world == 0 and self.current_level == 1:
             self.tutorial_ui = TutorialUi(self)
 
@@ -643,5 +649,10 @@ def drawText(surface, text, color, rect, font, aa=False, bkg=None):
 
         # remove the text we just blitted
         text = text[i:]
+
+    return text
+
+    # remove the text we just blitted
+    text = text[i:]
 
     return text
