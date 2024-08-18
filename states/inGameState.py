@@ -1,4 +1,4 @@
-
+from sand_simulathor.sand_simulator import SandSimulator
 import os
 
 import numpy as np
@@ -152,6 +152,17 @@ class CardUi:
         if (self.rect.topleft == self.initPos):
             self.needUpdate = False
 
+class SandUi:
+    def __init__(self):
+        self.sim = SandSimulator()
+
+    def update(self):
+        self.sim.update_particles()
+
+    def draw(self, surface):
+        self.sim.draw_particles(70., surface)
+
+
 
 class InGameState(State):
 
@@ -279,6 +290,9 @@ class InGameState(State):
         self.help_ui.draw(screen)
 
     def draw(self, screen) -> None:
+        self.sand_ui.draw(screen)
+
+        self.sand_ui.update()
         for card_slot in self.card_slots:
             card_slot.draw(screen)
 
@@ -288,6 +302,7 @@ class InGameState(State):
         self.draw_total(screen)
 
         self.draw_help_ui(screen)
+
 
     def init_card_slots(self):
         self.card_slots: list[CardSlotUi] = []
@@ -368,6 +383,8 @@ class InGameState(State):
         self.init_card_slots()
 
         self.help_ui = HelpUi(self.level.cards)
+
+        self.sand_ui = SandUi()
 
     def onExitState(self) -> None:
         pass
