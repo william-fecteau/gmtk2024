@@ -75,10 +75,12 @@ class CardUi:
         self.card = card
 
         self.surf = pygame.Surface((size, size))
+        self.isHover = False
         #self.surf.fill((147, 147, 147))
-        self.cardImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
+        self.cardImage = pygame.image.load(resource_path('./res/CarteV2.png')).convert_alpha()
+        self.cardImageHover = pygame.image.load(resource_path('./res/carteV1.png')).convert_alpha()
         self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
-
+        
         card_text = self.get_card_display()
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                      48).render(card_text, True, (0, 0, 0))
@@ -110,6 +112,11 @@ class CardUi:
         self.rect.topleft = pos
 
     def draw(self, surface: pygame.Surface):
+        if (self.isHover):
+            print("Monkey")
+            self.surf.blit(self.cardImageHover, pygame.Rect(0, 0, 80, 80))
+        else:
+            self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
         surface.blit(self.surf, self.rect.topleft)
 
     def setComebackPosition(self):
@@ -216,7 +223,9 @@ class InGameState(State):
     def is_over_card(self, mouse_pos: tuple[int, int]):
         for card_ui in self.cards_ui:
             if card_ui.rect.collidepoint(mouse_pos):
-                print("Monkey")
+                card_ui.isHover = True
+            else:
+                card_ui.isHover = False
     
     def handle_mouse_down(self):
         mouse_pos = pygame.mouse.get_pos()
