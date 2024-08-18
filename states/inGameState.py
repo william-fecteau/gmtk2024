@@ -1,15 +1,20 @@
 import os
+
 import numpy as np
 import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
-from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHTER_GRAY, SCREEN_SIZE, WORLD_COLOR
+
+from constants import (BLACK, DARK_GRAY, GREEN_COLOR, LIGHTER_GRAY,
+                       SCREEN_SIZE, WORLD_COLOR)
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
 from states.payloads import InGameStatePayload
 from utils import get_max_levels_per_world, get_max_worlds, resource_path
+
 from .state import State
+
 
 class HelpUi:
     def __init__(self, help_text: str):
@@ -275,7 +280,7 @@ class InGameState(State):
             for slot in self.card_slots:
                 if slot.cardInside(self.selected_card):
                     self.dontMove = True
-                    if slot.card != None and slot.cardUI != None:
+                    if slot.card != None and slot.cardUI != None and slot.cardUI != self.selected_card:
                         slot.cardUI.setComebackPosition()
                         self.selected_card.rect.center = slot.rect.center
                         slot.card = self.selected_card.card
