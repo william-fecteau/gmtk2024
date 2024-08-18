@@ -2,7 +2,7 @@ from constants import GREEN_COLOR, TARGET_FPS
 from states.menuState import MenuState
 from utils import resource_path
 from states.state import State
-from random import randint
+from random import randint, shuffle
 import pygame
 import os
 
@@ -19,36 +19,37 @@ class CreditsState(State):
         gamersDirectoryPath = resource_path(os.path.join("res", "credits"))
         gamersDirectory = os.fsencode(gamersDirectoryPath)
         gamerNames = []
-    
+
         for file in os.listdir(gamersDirectory):
             filename = os.fsdecode(file)
             gamerName = filename.split("_")[0]
 
             if (gamerName not in gamerNames):
                 gamerNames.append(gamerName)
-                self.gamers.append(Gamer(len(self.gamers), self, gamerName))
+                self.gamers.append(Gamer(self, gamerName))
 
     def onEnterState(self, payload) -> None:
+        shuffle(self.gamers)
+
         for gamer in self.gamers:
             gamer.UpdateRandoms()
-    
+
     def update(self) -> None:
         for event in self.game.events:
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.game.switchState(MenuState.__name__)
-        
+
         for gamer in self.gamers:
             gamer.Update(self.currentFrame)
 
         self.currentFrame += 1
 
     def draw(self, screen) -> None:
-        for gamer in self.gamers:
-            gamer.Draw(screen)
+        for i in range(0, len(self.gamers)):
+            self.gamers[i].Draw(screen, i)
 
 class Gamer:
-    def __init__(self, id, state, name) -> None:
-        self.id = id
+    def __init__(self, state, name) -> None:
         self.name = name
         self.state = state
         self.sprites = self.LoadSprites()
@@ -75,11 +76,11 @@ class Gamer:
 
     def Update(self, currentFrame):
         if (currentFrame % TARGET_FPS == self.updateFrame):
-            self.animationIndex = (self.animationIndex + 1) % len(self.sprites) 
+            self.animationIndex = (self.animationIndex + 1) % len(self.sprites)
 
-    def Draw(self, screen):
-        posX = self.state.screenSize[0] / 3 * (self.id % 3)
-        posY = self.state.screenSize[1] / 4 * (self.id // 3)
+    def Draw(self, screen, positionId):
+        posX = self.state.screenSize[0] / 3 * (positionId % 3)
+        posY = self.state.screenSize[1] / 4 * (positionId // 3)
         self.DrawLogo(screen, posX, posY)
         self.DrawName(screen, posX, posY)
 
