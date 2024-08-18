@@ -4,30 +4,39 @@ from cutscenes.cutscene import Cutscene
 
 class CutsceneWorld(Cutscene):
     def __init__(self, manager, currentWorldNumber : int):
-        super().__init__(manager)
+        super().__init__(manager, currentWorldNumber)
         self.InitTitles(currentWorldNumber)
+        self.startTime = pygame.time.get_ticks()
         self.currentStep = 0
 
     def InitTitles(self, worldNumber : int):
-        nextWorldNumber = worldNumber + 1
+        self.worldNumber = worldNumber
+        self.nextWorldNumber = worldNumber + 1
         worldBits = 2 ** (worldNumber + 1)
-        nextWorldBits = 2 ** (nextWorldNumber + 1)
+        nextWorldBits = 2 ** (self.nextWorldNumber + 1)
         self.currentWorldTitle = "World " + str(worldNumber)
         self.currentWorldSubTitle = str(worldBits) + "-bit Integer"
-        self.nextWorldTitle = "World " + str(nextWorldNumber)
+        self.nextWorldTitle = "World " + str(self.nextWorldNumber)
         self.nextWorldSubTitle = str(nextWorldBits) + "-bit Integer"
 
     def SetStep(self, step : int):
         self.currentStep = step
 
+    def GetPreviousCutscene(self) -> Cutscene:
+        return Cutscene(self.manager, 0) # Must override in children
+
     def Draw(self, screen : pygame.Surface):
         self.DrawNextWorld(screen)
         self.DrawCurrentWorld(screen)
+        self.DrawPreviousWorld(screen)
         self.currentStep += 1
+
+        seconds = (pygame.time.get_ticks() - self.startTime) / 1000
+        self.completed = seconds > 6
 
     def DrawNextWorld(self, screen : pygame.Surface):
         screenCopy = screen.copy()
-        screenCopy.fill(BLACK)
+        screenCopy.fill(BLACK if (self.nextWorldNumber % 2 == 0) else LIGHT_BLACK)
 
         mainTitle : pygame.Surface = self.manager.largeFont.render(self.nextWorldTitle, True, GREEN_COLOR)
         mainTitlePosX = screenCopy.get_width() / 4 * 3 - (mainTitle.get_width() / 2)
@@ -48,17 +57,17 @@ class CutsceneWorld(Cutscene):
 
     def DrawCurrentWorld(self, screen : pygame.Surface):
         screenCopy = screen.copy()
-        screenCopy.fill(LIGHT_BLACK)
+        screenCopy.fill(BLACK if (self.worldNumber % 2 == 0) else LIGHT_BLACK)
 
         mainTitle : pygame.Surface = self.manager.largeFont.render(self.currentWorldTitle, True, GREEN_COLOR)
-        mainTitlePosX = screenCopy.get_rect().center[0] - (mainTitle.get_width() / 2)
-        mainTitlePosY = screenCopy.get_rect().center[1] - (mainTitle.get_height() / 2)
+        mainTitlePosX = screenCopy.get_width() / 4 * 3 - (mainTitle.get_width() / 2)
+        mainTitlePosY = screenCopy.get_height() / 4 - (mainTitle.get_height() / 2)
         mainTitlePos = [mainTitlePosX, mainTitlePosY]
         screenCopy.blit(mainTitle, mainTitlePos)
 
         subTitle : pygame.Surface = self.manager.mediumFont.render(self.currentWorldSubTitle, True, GREEN_COLOR)
-        subTitlePosX = screenCopy.get_rect().center[0] - (subTitle.get_width() / 2)
-        subTitlePosY = screenCopy.get_rect().center[1] - (subTitle.get_height() / 2)
+        subTitlePosX = screenCopy.get_width() / 4 * 3 - (subTitle.get_width() / 2)
+        subTitlePosY = screenCopy.get_height() / 4 - (subTitle.get_height() / 2)
         subTitlePos = [subTitlePosX, subTitlePosY + (mainTitle.get_height() / 2) + 10]
         screenCopy.blit(subTitle, subTitlePos)
 
@@ -66,3 +75,13 @@ class CutsceneWorld(Cutscene):
         scaledSize = [screen.get_width() * scalePercent, screen.get_height() * scalePercent]
         scaledCutScene = pygame.transform.scale(screenCopy, scaledSize)
         screen.blit(scaledCutScene, (0, self.manager.screenSize[1] - scaledCutScene.get_height()))
+
+    def DrawPreviousWorld(self, screen : pygame.Surface):
+        prevScreenCopy = screen.copy()
+        previousCutscene = self.GetPreviousCutscene()
+        previousCutscene.Draw(prevScreenCopy)
+
+        scalePercent = max(0.5, (1 / max(1, self.currentStep / TARGET_FPS / 2))) / 2
+        scaledSize = [screen.get_width() * scalePercent, screen.get_height() * scalePercent]
+        scaledPrevCutscene = pygame.transform.scale(prevScreenCopy, scaledSize)
+        screen.blit(scaledPrevCutscene, (0, self.manager.screenSize[1] - scaledPrevCutscene.get_height()))
