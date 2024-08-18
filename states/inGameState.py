@@ -8,7 +8,7 @@ import sympy.core.numbers as spnumbers
 from constants import DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
 from levels import Card, evaluate_solution, load_level
 from states.payloads import InGameStatePayload
-from utils import resource_path
+from utils import get_max_levels_per_world, get_max_worlds, resource_path
 
 from .state import State
 
@@ -194,8 +194,21 @@ class InGameState(State):
 
         # If overflow, switch to next level
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
+            max_worlds = get_max_worlds()
+            max_levels = get_max_levels_per_world(self.current_world)
+
+            next_world = self.current_world
+            next_level = self.current_level + 1
+
+            if next_level > max_levels:
+                next_world += 1
+                next_level = 1
+
+            if next_world >= max_worlds:
+                self.game.switchState("CreditsState")
+
             self.game.switchState("InGameState", InGameStatePayload(
-                self.current_world, self.current_level+1))
+                next_world, next_level))
 
     def draw_total(self, screen: pygame.Surface) -> None:
         parsed_answer = "???"
