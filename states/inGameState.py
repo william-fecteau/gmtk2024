@@ -1,3 +1,4 @@
+
 import os
 
 import numpy as np
@@ -401,13 +402,30 @@ class InGameState(State):
         screen.blit(surf, self.next_button_rect)
 
     def draw_bite(self, screen):
+        color_gradient = [
+            (255, 255, 255),
+            (255, 211, 218),
+            (212, 149, 149),
+            (210, 127, 127),
+            (202, 107, 107),
+            (200, 92, 92),
+            (204, 63, 63),
+            (211, 0, 0),
+            (186, 8, 40),
+            (153, 0, 0),
+        ]
+
         value = self.current_answer if self.current_answer is not None else 0
+
+        color_index = int(value * 10 / (2 ** self.level.nb_bits_to_overflow - 1))
+        color_index = min(color_index, 9)
+        color = color_gradient[color_index]
 
         binary_str = bin(int(value))[2:]
         binary_str = binary_str.zfill(self.level.nb_bits_to_overflow)
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                          40).render(binary_str, True, (255, 255, 255))
+                                          40).render(binary_str, True, color)
         self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
         self.desc_rect.y = 110
 
@@ -490,4 +508,5 @@ class InGameState(State):
             self.cards_ui.append(
                 CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((card_offset + card_size) * resetCount) + self.card_slots[-1].rect.bottom + 20, card_size))
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
+                resetCount += 1
                 resetCount += 1
