@@ -1,5 +1,5 @@
 {
   "nbBitsToOverflow": 4,
   "cards": ["4", "4", "*"],
-  "hint": "Drag and drop the characters into the text box to write the answer"
+  "hint": "You need to find an expression that results in a number higher than 15\nDrag and drop characters into the boxes to write the answer"
 }

@@ -1,5 +1,5 @@
 {
   "nbBitsToOverflow": 8,
   "cards": ["20", "5", "5", "5", "+", "+", "(", ")", "*"],
-  "hint": "It’s often best to add to the smallest number in a multiplication"
+  "hint": "It's often best to add to the smallest number in a multiplication"
 }

@@ -1,5 +1,5 @@
 {
   "nbBitsToOverflow": 4,
   "cards": ["-1", "-16", "*"],
-  "hint": "We need to overflow, not underflow, Negative numbers can be can celled by another minus sign"
+  "hint": "We need to overflow, not underflow\nNegative numbers can be made positive with another minus sign"
 }

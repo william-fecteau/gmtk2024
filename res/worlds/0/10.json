@@ -1,5 +1,5 @@
 {
   "nbBitsToOverflow": 4,
   "cards": ["-3", "-2", "3", "1", "(", ")", "(", ")", "^", "+", "-"],
-  "hint": "odd exponents will maintain the minus sign, even ones will cancel it"
+  "hint": "Odd exponents will maintain the minus sign, even ones will cancel it"
 }

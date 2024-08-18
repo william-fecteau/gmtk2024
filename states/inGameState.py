@@ -6,7 +6,7 @@ import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
 
-from constants import DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
+from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
@@ -25,22 +25,19 @@ class HelpUi:
         self.surf.fill(LIGHT_GRAY)
         self.surf.set_alpha(253)
 
-        font_big = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 48)
         font_smoll = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
-
-        close_surf = font_big.render("X", True, (0, 0, 0))
-        self.close_rect = close_surf.get_rect(topleft=(width - 50, 10))
-        self.surf.blit(close_surf, self.close_rect)
 
         self.is_open = False
         display = pygame.display.get_surface().get_rect()
         self.help_surf_rect = self.surf.get_rect(bottom=display.bottom, centerx=display.centerx)
         self.help_surf_rect.move_ip(0, -30)
 
-        self.close_rect.move_ip(self.help_surf_rect.topleft)
+        textLines = help_text.split("\n")
 
-        text_surf = font_smoll.render(help_text, True, (0, 0, 0))
-        self.surf.blit(text_surf, text_surf.get_rect(center=self.surf.get_rect().center))
+        for i in range(0, len(textLines)):
+            textSurface : pygame.Surface = font_smoll.render(textLines[i], True, BLACK)
+            textPosition = textSurface.get_rect(center = self.surf.get_rect().center).move(0, (i - 1) * 25)
+            self.surf.blit(textSurface, textPosition)
 
     def draw(self, screen: pygame.Surface):
         if self.is_open:
@@ -262,8 +259,6 @@ class InGameState(State):
             else:
                 self.help_ui.open()
         elif self.help_ui.is_open and not self.help_ui.help_surf_rect.collidepoint(mouse_pos):
-            self.help_ui.close()
-        elif self.help_ui.close_rect.collidepoint(mouse_pos):
             self.help_ui.close()
 
         # Next Button
