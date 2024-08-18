@@ -49,6 +49,7 @@ class CardSlotUi:
         self.surf = pygame.Surface((size, size))
         self.surf.fill(DARK_GRAY)
         self.card: Card | None = None
+        self.cardUI: CardUi | None = None
 
         self.rect = pygame.Rect(x, y, size, size)
 
@@ -89,8 +90,8 @@ class CardUi:
             return "÷"
         elif value == "sqrt":
             return "√"
-        elif value == "sqrt(":
-            return "√("
+        elif value.startswith("sqrt("):
+            return value.replace("sqrt(", "√").replace(")", "")
         elif value == "pi":
             return "π"
 
@@ -102,23 +103,21 @@ class CardUi:
     def draw(self, surface: pygame.Surface):
         surface.blit(self.surf, self.rect.topleft)
 
-    def saveInitialPos(self, pos: tuple[int, int]) -> None:
-        self.initPos = pos
-
-    def setComebackPosition(self, pos: tuple[int, int]):
+    def setComebackPosition(self):
         self.needUpdate = True
+
     def moveToInitPost(self):
         distance = 10
         distanceX = abs(self.rect.topleft[0] - self.initPos[0])
         distanceY = abs(self.rect.topleft[1] - self.initPos[1])
 
-        if(distanceX == 0):
+        if (distanceX == 0):
             ratioDistanceY = distanceY/1
             parcoursY = distance*ratioDistanceY
         else:
             ratioDistanceY = distanceY/distanceX
             parcoursY = distance*ratioDistanceY
-        if(distanceY == 0):
+        if (distanceY == 0):
             ratioDistanceX = distanceX/1
             parcoursX = distance*ratioDistanceX
         else:
@@ -127,26 +126,25 @@ class CardUi:
 
         newX = self.rect.topleft[0]
         newY = self.rect.topleft[1]
-        if(abs(self.rect.topleft[0] - self.initPos[0]) < parcoursX):
-            if(self.rect.topleft[0] > self.initPos[0]):
+        if (abs(self.rect.topleft[0] - self.initPos[0]) < parcoursX):
+            if (self.rect.topleft[0] > self.initPos[0]):
                 newX = self.rect.topleft[0] - (self.rect.topleft[0] - self.initPos[0])
             if (self.rect.topleft[0] < self.initPos[0]):
                 newX = self.rect.topleft[0] + (self.rect.topleft[0] - self.initPos[0])
 
-        if(abs(self.rect.topleft[1] - self.initPos[1]) < parcoursY):
-            if(self.rect.topleft[1] > self.initPos[1]):
+        if (abs(self.rect.topleft[1] - self.initPos[1]) < parcoursY):
+            if (self.rect.topleft[1] > self.initPos[1]):
                 newY = self.rect.topleft[1] - (self.rect.topleft[1] - self.initPos[1])
             if (self.rect.topleft[1] < self.initPos[1]):
                 newY = self.rect.topleft[1] + (self.rect.topleft[1] - self.initPos[1])
 
-        
-        if(newX > self.initPos[0]):
+        if (newX > self.initPos[0]):
             newX = self.rect.topleft[0] - parcoursX
-        if(newY > self.initPos[1]):
+        if (newY > self.initPos[1]):
             newY = self.rect.topright[1] - parcoursY
-        if(newX < self.initPos[0]):
+        if (newX < self.initPos[0]):
             newX = self.rect.topleft[0] + parcoursX
-        if(newY < self.initPos[1]):
+        if (newY < self.initPos[1]):
             newY = self.rect.topleft[1] + parcoursY
 
         self.rect.topleft = (int(newX), int(newY))
@@ -197,31 +195,45 @@ class InGameState(State):
                     for slot in self.card_slots:
                         if slot.cardInside(self.selected_card):
                             self.dontMove = True
+                            if slot.card != None and slot.cardUI != None:
+                                slot.cardUI.setComebackPosition()
+                                self.selected_card.rect.center = slot.rect.center
+                                slot.card = self.selected_card.card
+                                slot.cardUI = self.selected_card
+                            if slot.card == None and slot.cardUI == None:
+                                self.selected_card.rect.center = slot.rect.center
+
+                                slot.card = self.selected_card.card
+                                slot.cardUI = self.selected_card
 
                     if self.dontMove == False:
-                        self.selected_card.setComebackPosition(self.selected_card.initPos)
+                        self.selected_card.setComebackPosition()
                     self.selected_card = None
                 for slot in self.card_slots:
                     for card_ui in self.cards_ui:
                         if slot.cardInside(card_ui):
                             slot.setColor(GREEN_COLOR)
-                            card_ui.rect.center = slot.rect.center
-                            slot.card = card_ui.card
+                            if slot.card == None and slot.cardUI == None:
+                                card_ui.rect.center = slot.rect.center
+
+                                slot.card = card_ui.card
+                                slot.cardUI = card_ui
                             break
                         else:
                             slot.setColor(DARK_GRAY)
                             slot.card = None
+                            slot.cardUI = None
                 self.current_answer = self.getAnswer()
 
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore
-        
+
         for card in self.cards_ui:
             if card.needUpdate == True:
                 card.moveToInitPost()
         # If overflow, switch to next level
-        
+
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
             pygame.mixer.Sound.play(self.level_clear)
             max_worlds = get_max_worlds()
@@ -244,7 +256,7 @@ class InGameState(State):
         parsed_answer = "???"
         if self.current_answer is not None:
             if isinstance(self.current_answer, spnumbers.Integer):
-                parsed_answer = f'{self.current_answer:,}'
+                parsed_answer = f'{self.current_answer}'
             else:
                 parsed_answer = f'{self.current_answer:.2f}'
 
@@ -304,10 +316,9 @@ class InGameState(State):
 
         nb_separator = 0
         if slot_width > 1280:
-           nb_separator = 1280 // (slot_size + slot_offset)
-           slot_width = nb_separator * (slot_size + slot_offset)
-           card_width = nb_separator * (card_size + card_offset)
-        
+            nb_separator = 1280 // (slot_size + slot_offset)
+            slot_width = nb_separator * (slot_size + slot_offset)
+            card_width = nb_separator * (card_size + card_offset)
 
         start_slot = np.array(self.game.screen.get_rect().center) - np.array((slot_width // 2, slot_size // 2))
         start_slot[1] = start_slot[1] - 25
@@ -337,7 +348,7 @@ class InGameState(State):
 
         try:
             value = evaluate_solution(self.level, solutions)  # type: ignore
-        except:
+        except Exception as e:
             return None
 
         return value
