@@ -77,6 +77,7 @@ class CardUi:
         self.surf.blit(text_surf, text_rect)
 
         self.rect = pygame.Rect(x, y, size, size)
+        self.initPos = self.rect.topleft
         self.needUpdate = False
 
     def get_card_display(self) -> str:
@@ -171,7 +172,7 @@ class InGameState(State):
                     for card_ui in self.cards_ui:
                         if card_ui.rect.collidepoint(mouse_pos):
                             self.selected_card = card_ui
-                            self.selected_card.saveInitialPos(card_ui.rect.topleft)
+                            #self.selected_card.saveInitialPos(card_ui.rect.topleft)
                             self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                             break
 
