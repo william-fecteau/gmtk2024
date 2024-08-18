@@ -4,7 +4,7 @@ import pygame
 import pygame_menu
 import pygame_menu.themes
 
-from constants import BLACK, EMERALD, GREEN_COLOR, SCREEN_SIZE
+from constants import BLACK, GREEN_COLOR, SCREEN_SIZE, WHITE
 from states.payloads import InGameStatePayload
 from states.state import State
 from utils import get_max_levels_per_world, get_max_worlds, resource_path
@@ -32,7 +32,7 @@ class LevelSelectState (State):
         self.menu.draw(self.surf)
 
         posMaintext = (float(screen.get_width()/4), float(50))
-        self.surf.blit(self.bigSnakeFont.render("Level Selection", True, GREEN_COLOR), posMaintext)
+        self.surf.blit(self.bigSnakeFont.render("Level Selection", True, WHITE), posMaintext)
 
         screen.blit(self.surf, (0, 0))
 
@@ -53,10 +53,10 @@ class LevelSelectState (State):
     def setupMenu(self) -> None:
         width, height = SCREEN_SIZE
 
-        cool_theme = pygame_menu.themes.THEME_GREEN.copy()  # type: ignore
+        cool_theme = pygame_menu.themes.THEME_DEFAULT.copy()  # type: ignore
         cool_theme.background_color = BLACK
         cool_theme.widget_font = self.smollestSnakeFont
-        cool_theme.widget_font_color = EMERALD
+        cool_theme.widget_font_color = WHITE
         cool_theme.selection_color = GREEN_COLOR
         cool_theme.widget_offset = (0, 200)
 

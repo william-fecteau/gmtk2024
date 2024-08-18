@@ -3,7 +3,7 @@ from math import floor
 import pygame
 import pygame_menu
 
-from constants import BLACK, EMERALD, GREEN_COLOR, SCREEN_SIZE
+from constants import BLACK, GREEN_COLOR, SCREEN_SIZE, WHITE
 from states.payloads import InGameStatePayload
 from states.state import State
 from utils import resource_path
@@ -38,11 +38,11 @@ class MenuState (State):
         self.menu.draw(self.surf)
 
         self.surf.blit(self.bigSnakeFont.render(
-            "Overflow", True, GREEN_COLOR), (150, 50))
+            "Overflow", True, WHITE), (150, 50))
         self.surf.blit(self.smolSnakeFont.render(
-            "Number get big", True, GREEN_COLOR), (150, 125))
+            "Number get big", True, WHITE), (150, 125))
         self.surf.blit(self.smolSnakeFont.render("Centering text is hard",
-                       True, GREEN_COLOR), (width-450, height-50))
+                       True, WHITE), (width-450, height-50))
 
         screen.blit(self.surf, (0, 0))
 
@@ -65,7 +65,7 @@ class MenuState (State):
         cool_theme = pygame_menu.themes.THEME_GREEN.copy()  # type: ignore
         cool_theme.background_color = BLACK
         cool_theme.widget_font = self.bigSnakeFont
-        cool_theme.widget_font_color = EMERALD
+        cool_theme.widget_font_color = WHITE
         cool_theme.selection_color = GREEN_COLOR
         cool_theme.widget_offset = (0, 200)
 
