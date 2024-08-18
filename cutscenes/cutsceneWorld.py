@@ -1,5 +1,5 @@
 import pygame
-from constants import BLACK, GREEN_COLOR, LIGHT_BLACK, TARGET_CUTSCENE_FPS
+from constants import BLACK, LIGHT_BLACK, TARGET_CUTSCENE_FPS, WHITE, WORLD_COLORS
 from cutscenes.cutscene import Cutscene
 
 class CutsceneWorld(Cutscene):
@@ -38,14 +38,15 @@ class CutsceneWorld(Cutscene):
     def DrawNextWorld(self, screen : pygame.Surface):
         screenCopy = screen.copy()
         screenCopy.fill(BLACK if (self.nextWorldNumber % 2 == 0) else LIGHT_BLACK)
+        textColor = WORLD_COLORS.get(self.nextWorldNumber, WHITE)
 
-        mainTitle : pygame.Surface = self.manager.largeFont.render(self.nextWorldTitle, True, GREEN_COLOR)
+        mainTitle : pygame.Surface = self.manager.largeFont.render(self.nextWorldTitle, True, textColor)
         mainTitlePosX = screenCopy.get_width() / 4 * 3 - (mainTitle.get_width() / 2)
         mainTitlePosY = screenCopy.get_height() / 4 - (mainTitle.get_height() / 2)
         mainTitlePos = [mainTitlePosX, mainTitlePosY]
         screenCopy.blit(mainTitle, mainTitlePos)
 
-        subTitle : pygame.Surface = self.manager.mediumFont.render(self.nextWorldSubTitle, True, GREEN_COLOR)
+        subTitle : pygame.Surface = self.manager.mediumFont.render(self.nextWorldSubTitle, True, textColor)
         subTitlePosX = screenCopy.get_width() / 4 * 3 - (subTitle.get_width() / 2)
         subTitlePosY = screenCopy.get_height() / 4 - (subTitle.get_height() / 2)
         subTitlePos = [subTitlePosX, subTitlePosY + (mainTitle.get_height() / 2) + 10]
@@ -59,14 +60,15 @@ class CutsceneWorld(Cutscene):
     def DrawCurrentWorld(self, screen : pygame.Surface):
         screenCopy = screen.copy()
         screenCopy.fill(BLACK if (self.worldNumber % 2 == 0) else LIGHT_BLACK)
+        textColor = WORLD_COLORS.get(self.worldNumber, WHITE)
 
-        mainTitle : pygame.Surface = self.manager.largeFont.render(self.currentWorldTitle, True, GREEN_COLOR)
+        mainTitle : pygame.Surface = self.manager.largeFont.render(self.currentWorldTitle, True, textColor)
         mainTitlePosX = screenCopy.get_width() / 4 * 3 - (mainTitle.get_width() / 2)
         mainTitlePosY = screenCopy.get_height() / 4 - (mainTitle.get_height() / 2)
         mainTitlePos = [mainTitlePosX, mainTitlePosY]
         screenCopy.blit(mainTitle, mainTitlePos)
 
-        subTitle : pygame.Surface = self.manager.mediumFont.render(self.currentWorldSubTitle, True, GREEN_COLOR)
+        subTitle : pygame.Surface = self.manager.mediumFont.render(self.currentWorldSubTitle, True, textColor)
         subTitlePosX = screenCopy.get_width() / 4 * 3 - (subTitle.get_width() / 2)
         subTitlePosY = screenCopy.get_height() / 4 - (subTitle.get_height() / 2)
         subTitlePos = [subTitlePosX, subTitlePosY + (mainTitle.get_height() / 2) + 10]
