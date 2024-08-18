@@ -21,4 +21,4 @@ class CutsceneWorld0(CutsceneWorld):
         screen.blit(subTitle, subTitlePos)
 
         self.currentStep += 1
-        self.completed = self.currentStep > 3 * TARGET_CUTSCENE_FPS
+        self.completed = self.currentStep > 2.5 * TARGET_CUTSCENE_FPS

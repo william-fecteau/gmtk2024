@@ -7,6 +7,7 @@ import sympy.core.numbers as spnumbers
 from sympy import false, true
 
 from constants import DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
+from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
 from states.payloads import InGameStatePayload
@@ -202,6 +203,7 @@ class InGameState(State):
         self.card_drop = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Drop.mp3'))
         self.card_pickup = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Pickup.mp3'))
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
+        self.cutsceneManager = CutsceneManager()
 
     # ==============================================================================================================
     # Update
@@ -344,6 +346,8 @@ class InGameState(State):
     # Drawing
     # ==============================================================================================================
     def draw(self, screen) -> None:
+        self.cutsceneManager.DisplayCustcene(screen)
+
         screen.blit(self.background, pygame.Rect(0, 0, 1280, 720))
 
         if (self.current_answer is not None):
@@ -463,8 +467,10 @@ class InGameState(State):
 
         self.init_card_slots()
 
-        self.help_ui = HelpUi(self.level.hint)
+        if (self.cutsceneManager.queuedCutscene != payload.world):
+            self.cutsceneManager.QueueCutscene(payload.world)
 
+        self.help_ui = HelpUi(self.level.hint)
         self.sand_ui = SandUi()
 
     def onExitState(self) -> None:
@@ -524,4 +530,3 @@ class InGameState(State):
                 CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((card_offset + card_size) * resetCount) + self.card_slots[-1].rect.bottom + 20, card_size))
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
                 resetCount += 1
-        

@@ -14,24 +14,37 @@ class CutsceneManager():
         fontRelativePath = os.path.join("res", "TTOctosquaresTrialRegular.ttf")
         self.mediumFont = pygame.font.Font(resource_path(fontRelativePath), 60)
         self.largeFont = pygame.font.Font(resource_path(fontRelativePath), 100)
-        self.skipCutscenes = False
         self.currentFrame = 0
 
-    def DisplayCustcene(self, screen : pygame.Surface, cutsceneId : int):
-        if (self.skipCutscenes):
+        self.skipCutscenes = False
+        self.cutscenePlayed = True
+        self.queuedCutscene = -1
+
+    def QueueCutscene(self, cutsceneId : int):
+        self.queuedCutscene = cutsceneId
+        self.cutscenePlayed = cutsceneId < 0
+
+    def DisplayCustcene(self, screen : pygame.Surface):
+        if (self.skipCutscenes or self.cutscenePlayed):
             return
 
-        match (cutsceneId):
+        match (self.queuedCutscene):
             case 0: cutscene = CutsceneWorld0(self)
             case 1: cutscene = CutsceneWorld1(self)
-            case _: cutscene = CutsceneWorldOther(self, cutsceneId)
+            case _: cutscene = CutsceneWorldOther(self, self.queuedCutscene)
 
         while True:
             if (pygame.event.peek(pygame.QUIT)):
                 pygame.quit()
                 sys.exit()
 
+            for event in pygame.event.get():
+                if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                    self.cutscenePlayed = True
+                    return
+
             if (cutscene.IsCompleted()):
+                self.cutscenePlayed = True
                 return
 
             cutscene.Draw(screen)

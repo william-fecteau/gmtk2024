@@ -7,9 +7,9 @@ class CutsceneWorld(Cutscene):
         super().__init__(manager, currentWorldNumber)
         self.InitTitles(currentWorldNumber)
         self.animationStartStep = 1.2 * TARGET_CUTSCENE_FPS
-        self.animationEndStep = 5 * TARGET_CUTSCENE_FPS
+        self.animationEndStep = 4 * TARGET_CUTSCENE_FPS
         self.animationSteps = self.animationEndStep - self.animationStartStep
-        self.cutsceneEndStep = 7 * TARGET_CUTSCENE_FPS
+        self.cutsceneEndStep = 6 * TARGET_CUTSCENE_FPS
         self.currentStep = 0
 
     def InitTitles(self, worldNumber : int):
