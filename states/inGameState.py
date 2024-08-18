@@ -152,9 +152,11 @@ class CardUi:
             newX = self.rect.topleft[0] + parcoursX
         if (newY < self.initPos[1]):
             newY = self.rect.topleft[1] + parcoursY
-
-        self.rect.topleft = (int(newX), int(newY))
-
+        try:
+            self.rect.topleft = (int(newX), int(newY))
+        except:
+            self.rect.topleft = self.initPos
+            
         if (self.rect.topleft == self.initPos):
             self.needUpdate = False
 
