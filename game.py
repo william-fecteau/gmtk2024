@@ -3,6 +3,7 @@ from typing import NamedTuple, Optional
 
 import pygame
 
+import utils
 from constants import SCREEN_SIZE, TARGET_FPS
 from states import CreditsState, InGameState, LevelSelectState, MenuState
 
@@ -14,6 +15,10 @@ class Game:
         pygame.display.set_caption("Overflow")
 
         self.screen = pygame.display.set_mode(SCREEN_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)
+        pygame.mixer.music.load(utils.resource_path('./res/MainThemeV3.mp3'))
+        pygame.mixer.music.set_volume(0.35)
+        pygame.mixer.music.play(-1)
+        
 
         # States
         self.dicStates = {
