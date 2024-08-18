@@ -192,6 +192,11 @@ class InGameState(State):
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore
 
+        # If overflow, switch to next level
+        if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
+            self.game.switchState("InGameState", InGameStatePayload(
+                self.current_world, self.current_level+1))
+
     def draw_total(self, screen: pygame.Surface) -> None:
         parsed_answer = "???"
         if self.current_answer is not None:
@@ -281,6 +286,9 @@ class InGameState(State):
     def onEnterState(self, payload: InGameStatePayload) -> None:
         pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
         pathLevel = os.path.join(pathStr)
+
+        self.current_world = payload.world
+        self.current_level = payload.level
         self.level = load_level(pathLevel)
 
         self.current_answer: float | None = None
