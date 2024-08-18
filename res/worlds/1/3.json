@@ -1,4 +1,5 @@
 {
   "nbBitsToOverflow": 8,
-  "cards": ["26", "2", "0.2", "/", "*"]
+  "cards": ["26", "2", "0.2", "/", "*"],
+  "hint": "Dividing by a small number can give you great results"
 }

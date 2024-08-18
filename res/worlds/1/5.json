@@ -1,4 +1,5 @@
 {
   "nbBitsToOverflow": 8,
-  "cards": ["1", "0.004", "-0.00009375", "/", "/", "(", ")", "+", "+", "*"]
+  "cards": ["1", "0.004", "-0.00009375", "/", "/", "(", ")", "+", "+", "*"],
+  "hint": "The smaller they are the bigger they become"
 }
