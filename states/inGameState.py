@@ -14,24 +14,30 @@ from .state import State
 
 
 class HelpUi:
-    def __init__(self, cards: list[Card]):
+    def __init__(self, help_text: str):
         width, height = SCREEN_SIZE
         width *= 0.8
-        height *= 0.8
+        height *= 0.2
         self.surf = pygame.Surface((width, height))
         self.surf.fill(LIGHT_GRAY)
         self.surf.set_alpha(253)
 
-        font = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 48)
+        font_big = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 48)
+        font_smoll = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
 
-        close_surf = font.render("X", True, (0, 0, 0))
+        close_surf = font_big.render("X", True, (0, 0, 0))
         self.close_rect = close_surf.get_rect(topleft=(width - 50, 10))
         self.surf.blit(close_surf, self.close_rect)
 
         self.is_open = False
-        self.help_surf_rect = self.surf.get_rect(center=pygame.display.get_surface().get_rect().center)
+        display = pygame.display.get_surface().get_rect()
+        self.help_surf_rect = self.surf.get_rect(bottom=display.bottom, centerx=display.centerx)
+        self.help_surf_rect.move_ip(0, -30)
 
         self.close_rect.move_ip(self.help_surf_rect.topleft)
+
+        text_surf = font_smoll.render(help_text, True, (0, 0, 0))
+        self.surf.blit(text_surf, text_surf.get_rect(center=self.surf.get_rect().center))
 
     def draw(self, screen: pygame.Surface):
         if self.is_open:
@@ -152,6 +158,7 @@ class CardUi:
         if (self.rect.topleft == self.initPos):
             self.needUpdate = False
 
+
 class SandUi:
     def __init__(self):
         self.sim = SandSimulator()
@@ -161,7 +168,6 @@ class SandUi:
 
     def draw(self, overflow_ammount, surface):
         self.sim.draw_particles(overflow_ammount, surface)
-
 
 
 class InGameState(State):
@@ -186,7 +192,7 @@ class InGameState(State):
                         if card_ui.rect.collidepoint(mouse_pos):
                             self.selected_card = card_ui
                             pygame.mixer.Sound.play(self.card_pickup)
-                            #self.selected_card.saveInitialPos(card_ui.rect.topleft)
+                            # self.selected_card.saveInitialPos(card_ui.rect.topleft)
                             self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                             break
 
@@ -196,8 +202,9 @@ class InGameState(State):
                         self.help_ui.close()
                     else:
                         self.help_ui.open()
-
-                if self.help_ui.close_rect.collidepoint(mouse_pos):
+                elif self.help_ui.is_open and not self.help_ui.help_surf_rect.collidepoint(mouse_pos):
+                    self.help_ui.close()
+                elif self.help_ui.close_rect.collidepoint(mouse_pos):
                     self.help_ui.close()
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -295,7 +302,8 @@ class InGameState(State):
 
         if (self.current_answer is not None):
             overflow_ammount = self.current_answer * 100 / (2 ** self.level.nb_bits_to_overflow)
-        else: overflow_ammount = 0.0
+        else:
+            overflow_ammount = 0.0
         self.sand_ui.draw(overflow_ammount, screen)
 
         self.sand_ui.update()
@@ -309,7 +317,6 @@ class InGameState(State):
 
         self.draw_help_ui(screen)
 
-
     def init_card_slots(self):
         self.card_slots: list[CardSlotUi] = []
         self.cards_ui: list[CardUi] = []
@@ -317,7 +324,7 @@ class InGameState(State):
         self.goal_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
-        self.goal_rect.y = -20
+        self.goal_rect.y = -20  # 1/18 * self.game.screen.get_rect().h
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           40).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
@@ -325,7 +332,7 @@ class InGameState(State):
         self.desc_rect.y = 110
 
         self.world_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                          32).render('World ' + str(self.current_world) + ' Level '+ str(self.current_level), True, (255, 255, 255))
+                                           32).render('World ' + str(self.current_world) + ' Level ' + str(self.current_level), True, (255, 255, 255))
         self.world_rect = self.world_text.get_rect(bottomright=self.game.screen.get_rect().bottomright)
         self.world_rect.x -= 15
         self.world_rect.y -= 10
@@ -366,7 +373,6 @@ class InGameState(State):
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
                 resetCount += 1
 
-
     def getAnswer(self) -> float | None:
         solutions: list[Card] = []
         for slot in self.card_slots:
@@ -394,7 +400,7 @@ class InGameState(State):
 
         self.init_card_slots()
 
-        self.help_ui = HelpUi(self.level.cards)
+        self.help_ui = HelpUi(self.level.hint)
 
         self.sand_ui = SandUi()
 
