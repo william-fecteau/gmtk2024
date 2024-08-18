@@ -66,7 +66,7 @@ class CardSlotUi:
         self.surf.fill(color)
 
     def cardInside(self, card) -> bool:
-        largeRect = self.rect.inflate(50, 50)
+        largeRect = self.rect.inflate(100, 100)
         return largeRect.contains(card.rect)
 
 
@@ -548,6 +548,7 @@ TUTORIAL_STEPS = [
     "Those are the cards you can combine to overflow the target",
     "Drag or double-click the cards in these slots to make an equation",
     "The evaluated equation will show up here along with it's binary representation",
+    "If you need help, click on the '?' button to get an hint. Good luck!"
 ]
 
 
@@ -600,6 +601,9 @@ class TutorialUi:
             toplefty = self.game_state.card_slots[0].rect.centery - height // 2
         elif self.current_step == 3:
             toplefty = self.game_state.total_rect.centery - height // 2
+        elif self.current_step == 4:
+            topleftx = self.game_state.help_btn_rect.topleft[0]
+            toplefty = self.game_state.help_btn_rect.topleft[1] - height - 10
 
         self.cur_rect = self.surf.get_rect(topleft=(topleftx, toplefty))
 
