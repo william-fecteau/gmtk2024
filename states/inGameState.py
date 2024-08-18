@@ -405,6 +405,11 @@ class InGameState(State):
         binary_str = "0"
         if value >= 0:
             binary_str = bin(int(value))[2:]
+
+        # If overflow, we actually overflow
+        if value > 2 ** self.level.nb_bits_to_overflow - 1:
+            binary_str = "1"
+
         binary_str = binary_str.zfill(self.level.nb_bits_to_overflow)
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
