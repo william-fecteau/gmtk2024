@@ -244,8 +244,9 @@ class InGameState(State):
 
         self.total_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                            80).render(parsed_answer, True, (255, 255, 255))
-        self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
-        self.total_rect.y = self.totalHeight
+        self.total_rect = self.total_text.get_rect()
+        self.total_rect.x = int(1280 * 3 / 4)
+        self.total_rect.y = self.goal_rect.y + 30
         screen.blit(self.total_text, self.total_rect)
 
         screen.blit(self.goal_text, self.goal_rect)
@@ -277,12 +278,12 @@ class InGameState(State):
         self.goal_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
-        self.goal_rect.y = 1/15 * self.game.screen.get_rect().h
+        self.goal_rect.y = 1/18 * self.game.screen.get_rect().h
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           64).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
         self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
-        self.desc_rect.y = 1/4 * self.game.screen.get_rect().h
+        self.desc_rect.y = 7/32 * self.game.screen.get_rect().h
 
         slot_size = 100
         slot_offset = 20
@@ -302,6 +303,7 @@ class InGameState(State):
             card_width = nb_separator * (card_size + card_offset)
 
         start_slot = np.array(self.game.screen.get_rect().center) - np.array((slot_width // 2, slot_size // 2))
+        start_slot[1] = start_slot[1] - 25
         start_card = np.array(self.game.screen.get_rect().center) - \
             np.array((card_width // 2, -card_size // 2 - 20))
 
@@ -312,14 +314,13 @@ class InGameState(State):
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
                 resetCount += 1
 
-        self.totalHeight = self.card_slots[-1].rect.bottom
-
         resetCount = 0
-        for i, card in enumerate(self.level.cards):
+        for i, card in enumerate(self.level.cards):           
             self.cards_ui.append(
-                CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((slot_offset + slot_size) * resetCount) + self.totalHeight + 50, card_size))
+                CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((card_offset + card_size) * resetCount) + self.card_slots[-1].rect.bottom + 20, card_size))
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
                 resetCount += 1
+
 
     def getAnswer(self) -> float | None:
         solutions: list[Card] = []
