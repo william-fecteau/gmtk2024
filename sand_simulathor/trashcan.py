@@ -1,9 +1,11 @@
 import random
-from constants import PURPLE
+
 import pygame
 
+from constants import PURPLE
+
 aircolor = (0,0,0)    
-scale = 10
+scale = 20
 
 
 class Particle:
@@ -14,13 +16,16 @@ class Particle:
         self.y = y
         self.allelements = allelements
         self.SURFACE = SURFACE
+        
+        self.MAX_X_VALUE_MAYBE = 64
+        self.MAX_Y_VALUE_MAYBE = 36
     
     def checkkill(self,x,y): #checks to see if particle can be deleted
-        if not 0 <= self.x <= 128:
+        if not 0 <= self.x <= self.MAX_X_VALUE_MAYBE:
             self.draw(x,y,aircolor) #wipe pixel
             del self.allelements[(x,y)]
             return True
-        elif not 0 <= self.y <= 72:
+        elif not 0 <= self.y <= self.MAX_Y_VALUE_MAYBE:
             self.draw(x,y,aircolor)
             del self.allelements[(x,y)]
             return True
