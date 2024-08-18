@@ -35,8 +35,8 @@ class HelpUi:
         textLines = help_text.split("\n")
 
         for i in range(0, len(textLines)):
-            textSurface : pygame.Surface = font_smoll.render(textLines[i], True, BLACK)
-            textPosition = textSurface.get_rect(center = self.surf.get_rect().center).move(0, (i - 1) * 25)
+            textSurface: pygame.Surface = font_smoll.render(textLines[i], True, BLACK)
+            textPosition = textSurface.get_rect(center=self.surf.get_rect().center).move(0, (i - 1) * 25)
             self.surf.blit(textSurface, textPosition)
 
     def draw(self, screen: pygame.Surface):
@@ -74,7 +74,7 @@ class CardUi:
     def __init__(self, card: Card, x: int, y: int, size: int):
         self.card = card
 
-        self.surf = pygame.Surface((size, size))
+        self.surf = pygame.Surface((size, size), pygame.SRCALPHA)
         self.isHover = False
         # self.surf.fill((147, 147, 147))
         self.cardImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
@@ -122,6 +122,7 @@ class CardUi:
             self.surf.blit(self.cardImageHover, pygame.Rect(0, 0, 80, 80))
         else:
             self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
+
         self.card_text = self.get_card_display()
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                      self.lenght).render(self.card_text, True, (0, 0, 0))
@@ -184,12 +185,12 @@ class CardUi:
 
 class SandUi:
     def __init__(self, currentWorld: int):
-        color = 0,0,0
+        color = 0, 0, 0
         colorStr = "WORLD_" + str(currentWorld) + "_COLOR"
         try:
             color = WORLD_COLOR.get(colorStr)
         except:
-            color = 0,0,0
+            color = 0, 0, 0
 
         self.sim = SandSimulator(color)
 
@@ -272,6 +273,9 @@ class InGameState(State):
         if self.completed:
             if self.next_button_rect.collidepoint(mouse_pos):
                 self.go_next_level()
+
+        if self.tutorial_ui is not None:
+            self.tutorial_ui.on_click(mouse_pos)
 
     def handle_mouse_up(self):
         if self.selected_card != None:
@@ -374,6 +378,9 @@ class InGameState(State):
 
         self.draw_help_ui(screen)
 
+        if self.tutorial_ui is not None:
+            self.tutorial_ui.draw(screen)
+
     def draw_total(self, screen: pygame.Surface) -> None:
         # Choosing color
         color_gradient = [
@@ -465,6 +472,10 @@ class InGameState(State):
         self.current_level = payload.level
         self.level = load_level(pathLevel)
 
+        self.tutorial_ui = None
+        if self.current_world == 0 and self.current_level == 1:
+            self.tutorial_ui = TutorialUi(self)
+
         self.current_answer: float | None = None
         self.selected_card: CardUi | None = None
         self.mouse_click_offset = (0, 0)
@@ -534,3 +545,114 @@ class InGameState(State):
                 CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((card_offset + card_size) * resetCount) + self.card_slots[-1].rect.bottom + 20, card_size))
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
                 resetCount += 1
+
+
+TUTORIAL_STEPS = [
+    "This is the target you need to overflow, which mean you need a bigger number than this",
+    "Those are the cards you can combine to overflow the target",
+    "Drag or double-click the cards in these slots to make an equation",
+    "The evaluated equation will show up here along with it's binary representation",
+]
+
+
+class TutorialUi:
+    def __init__(self, game_state: InGameState):
+        self.game_state = game_state
+        self.font = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 18)
+        self.current_step = 0
+
+        self.cur_rect: pygame.Rect | None = None
+
+    def redraw_surf(self):
+        self.surf = pygame.Surface((400, 100))
+        self.surf.fill((147, 147, 147))
+
+        button = pygame.Surface((75, 25))
+        button.fill((0, 171, 255))
+
+        self.button_rect = button.get_rect(center=(self.surf.get_rect().centerx, self.surf.get_rect().bottom - 25))
+        next_surf = self.font.render("Next", True, (255, 255, 255))
+
+        button.blit(next_surf, next_surf.get_rect(center=button.get_rect().center))
+
+        self.surf.blit(button, self.button_rect)
+
+    def on_click(self, pos: tuple[int, int]):
+        if self.cur_rect is None:
+            return
+
+        rect = self.cur_rect.move(self.button_rect.topleft)
+
+        if rect.collidepoint(pos):
+            self.current_step = self.current_step + 1
+            if self.current_step >= len(TUTORIAL_STEPS):
+                self.current_step = -1
+
+    def draw(self, screen):
+        self.redraw_surf()
+
+        width, height = self.surf.get_size()
+
+        topleftx = screen.get_rect().width - width - 50
+
+        if self.current_step < 0:
+            return
+        if self.current_step == 0:
+            toplefty = self.game_state.goal_rect.centery - height // 2
+        elif self.current_step == 1:
+            toplefty = self.game_state.cards_ui[0].rect.centery - height // 2
+        elif self.current_step == 2:
+            toplefty = self.game_state.card_slots[0].rect.centery - height // 2
+        elif self.current_step == 3:
+            toplefty = self.game_state.total_rect.centery - height // 2
+
+        self.cur_rect = self.surf.get_rect(topleft=(topleftx, toplefty))
+
+        drawText(self.surf, TUTORIAL_STEPS[self.current_step], (0, 0, 0),
+                 self.surf.get_rect().inflate(-20, -20), self.font)
+
+        screen.blit(self.surf, self.cur_rect)
+
+
+def drawText(surface, text, color, rect, font, aa=False, bkg=None):
+    rect = pygame.Rect(rect)
+    y = rect.top
+    lineSpacing = -2
+
+    # get the height of the font
+    fontHeight = font.size("Tg")[1]
+
+    while text:
+        i = 1
+
+        # determine if the row of text will be outside our area
+        if y + fontHeight > rect.bottom:
+            break
+
+        # determine maximum width of line
+        while font.size(text[:i])[0] < rect.width and i < len(text):
+            i += 1
+
+        # if we've wrapped the text, then adjust the wrap to the last word
+        if i < len(text):
+            i = text.rfind(" ", 0, i) + 1
+
+        # render the line and blit it to the surface
+        if bkg:
+            image = font.render(text[:i], 1, color, bkg)
+            image.set_colorkey(bkg)
+        else:
+            image = font.render(text[:i], aa, color)
+
+        surface.blit(image, (rect.left, y))
+        y += fontHeight + lineSpacing
+
+        # remove the text we just blitted
+        text = text[i:]
+
+    return text
+
+    # remove the text we just blitted
+    text = text[i:]
+
+    return text
