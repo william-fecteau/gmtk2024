@@ -61,16 +61,40 @@ class CardUi:
         #self.rect.topleft = pos
         self.needUpdate = True
         print(self.rect.topleft[0])
-
+    #I'm sorry
     def moveToInitPost(self):
-        if(self.rect.topleft[0] != self.initPos[0]):
+        newX = self.rect.topleft[0]
+        newY = self.rect.topleft[1]
+        if(abs(self.rect.topleft[0] - self.initPos[0]) < 10):
+            if(self.rect.topleft[0] > self.initPos[0]):
+                newX = self.rect.topleft[0] - (self.rect.topleft[0] - self.initPos[0])
+            if(self.rect.topleft[0] < self.initPos[0]):
+                newX = self.rect.topleft[0] + (self.rect.topleft[0] - self.initPos[0])
+
+        if(abs(self.rect.topleft[1] - self.initPos[1]) < 10):
+            if(self.rect.topleft[1] > self.initPos[1]):
+                newY = self.rect.topleft[1] - (self.rect.topleft[1] - self.initPos[1])
+            if(self.rect.topleft[1] < self.initPos[1]):
+                newY = self.rect.topleft[1] + (self.rect.topleft[1] - self.initPos[1])
+
+        
+        if(newX > self.initPos[0]):
             newX = self.rect.topleft[0] -10
-            newY = self.rect.topright[1]
-            self.rect.topleft = (newX, newY)
-        print("a")
+        if(newY > self.initPos[1]):
+            newY = self.rect.topright[1] -10
+        if(newX < self.initPos[0]):
+            newX = self.rect.topleft[0] + 10
+        if(newY < self.initPos[1]):
+            newY = self.rect.topleft[1] + 10
+        self.rect.topleft = (newX, newY)
+
+        if(self.rect.topleft == self.initPos):
+            self.needUpdate = False
+        
 
 
 class InGameState(State):
+
     def __init__(self, game):
         super().__init__(game)
 
@@ -91,8 +115,15 @@ class InGameState(State):
                         self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                         break
         else:
+            #self.selected_card = None
             if self.selected_card != None:
-                self.selected_card.setComebackPosition(self.selected_card.initPos)
+                self.dontMove = False
+                for slot in self.card_slots:
+                    if slot.cardInside(self.selected_card):
+                        self.dontMove = True
+                
+                if self.dontMove == False:
+                    self.selected_card.setComebackPosition(self.selected_card.initPos)
                 self.selected_card = None
             for slot in self.card_slots:
                 for card_ui in self.cards_ui:
@@ -107,6 +138,11 @@ class InGameState(State):
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore
+
+        for card in self.cards_ui:
+            if card.needUpdate == True:
+                print("pepi")
+                card.moveToInitPost()
 
     def draw(self, screen) -> None:
         for card_slot in self.card_slots:
