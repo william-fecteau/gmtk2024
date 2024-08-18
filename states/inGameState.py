@@ -4,7 +4,9 @@ import numpy as np
 import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
-from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE, WORLD_COLORS
+
+from constants import (BLACK, DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE,
+                       WORLD_COLORS)
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
@@ -442,12 +444,11 @@ class InGameState(State):
     def draw_next(self, screen: pygame.Surface) -> None:
 
         surf = pygame.Surface((150, 80))
-        buttonImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
-        # surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
-        surf.fill((147, 147, 147))
+        buttonImage = pygame.image.load(resource_path('./res/NextLevelButton.png'))
+        surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
 
         next_button_text = pygame.font.Font(resource_path(
-            './res/TTOctosquaresTrialRegular.ttf'), 48).render("Next", True, (0, 0, 0))
+            './res/TTOctosquaresTrialRegular.ttf'), 42).render("Next", True, (0, 0, 0))
         text_rect = next_button_text.get_rect(center=surf.get_rect().center)
         surf.blit(next_button_text, text_rect)
         screen.blit(surf, self.next_button_rect)
@@ -556,8 +557,7 @@ class TutorialUi:
         self.cur_rect: pygame.Rect | None = None
 
     def redraw_surf(self):
-        self.surf = pygame.Surface((400, 100))
-        self.surf.fill((147, 147, 147))
+        self.surf = pygame.image.load(resource_path('./res/TextboxTutorial.png')).convert_alpha()
 
         button = pygame.Surface((75, 25))
         button.fill((0, 171, 255))
@@ -641,10 +641,5 @@ def drawText(surface, text, color, rect, font, aa=False, bkg=None):
 
         # remove the text we just blitted
         text = text[i:]
-
-    return text
-
-    # remove the text we just blitted
-    text = text[i:]
 
     return text
