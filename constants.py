@@ -15,8 +15,8 @@ WHITE = (240,240,240)
 
 # Colors World
 WORLD_COLOR = {
-    "WORLD_0_COLOR" : (125,125,125),
-    "WORLD_1_COLOR" : (68, 207, 108),
+    "WORLD_0_COLOR" : (5, 173, 22),
+    "WORLD_1_COLOR" : (50, 199, 184),
     "WORLD_2_COLOR" : (200,80,230),
     "WORLD_3_COLOR" : (207, 35, 138),
     "WORLD_4_COLOR" : (48, 194, 172),
