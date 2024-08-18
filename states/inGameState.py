@@ -345,7 +345,8 @@ class InGameState(State):
     def draw_help_ui(self, screen: pygame.Surface) -> None:
         help_surface = pygame.font.Font(resource_path(
             './res/TTOctosquaresTrialRegular.ttf'), 48).render("?", True, (255, 255, 255))
-        self.help_btn_rect = help_surface.get_rect(bottomleft=screen.get_rect().bottomleft)
+        posHelpButtion = (screen.get_rect().bottomleft[0]+30, screen.get_rect().bottomleft[1]-20)
+        self.help_btn_rect = help_surface.get_rect(bottomleft=posHelpButtion)
         screen.blit(help_surface, self.help_btn_rect)
 
         self.help_ui.draw(screen)
