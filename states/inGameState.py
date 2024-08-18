@@ -77,16 +77,15 @@ class CardUi:
         self.surf = pygame.Surface((size, size))
         self.isHover = False
         #self.surf.fill((147, 147, 147))
-        self.cardImage = pygame.image.load(resource_path('./res/CarteV2.png')).convert_alpha()
+        self.cardImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
         self.cardImageHover = pygame.image.load(resource_path('./res/carteV1.png')).convert_alpha()
         self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
         
-        card_text = self.get_card_display()
+        self.card_text = self.get_card_display()
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                     48).render(card_text, True, (0, 0, 0))
+                                     48).render(self.card_text, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
-        
 
         self.rect = pygame.Rect(x, y, size, size)
         self.initPos = self.rect.topleft
@@ -113,10 +112,15 @@ class CardUi:
 
     def draw(self, surface: pygame.Surface):
         if (self.isHover):
-            print("Monkey")
             self.surf.blit(self.cardImageHover, pygame.Rect(0, 0, 80, 80))
         else:
             self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
+        self.card_text = self.get_card_display()
+        text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                     48).render(self.card_text, True, (0, 0, 0))
+        text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
+        self.surf.blit(text_surf, text_rect)
+
         surface.blit(self.surf, self.rect.topleft)
 
     def setComebackPosition(self):
@@ -340,6 +344,8 @@ class InGameState(State):
 
         self.draw_total(screen)
 
+        self.draw_bite(screen)
+
         self.draw_help_ui(screen)
 
     def draw_total(self, screen: pygame.Surface) -> None:
@@ -357,7 +363,6 @@ class InGameState(State):
         screen.blit(self.total_text, self.total_rect)
 
         screen.blit(self.goal_text, self.goal_rect)
-        screen.blit(self.desc_goal, self.desc_rect)
         screen.blit(self.world_text, self.world_rect)
 
     def draw_help_ui(self, screen: pygame.Surface) -> None:
@@ -369,9 +374,23 @@ class InGameState(State):
 
         self.help_ui.draw(screen)
 
+    def draw_bite(self, screen):
+        value = self.current_answer if self.current_answer is not None else 0
+
+        binary_str = bin(int(value))[2:]
+        binary_str = binary_str.zfill(self.level.nb_bits_to_overflow)
+
+        self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                          40).render(binary_str, True, (255, 255, 255))
+        self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
+        self.desc_rect.y = 110
+
+        screen.blit(self.desc_goal, self.desc_rect)
+
     # ==============================================================================================================
     # State management
     # ==============================================================================================================
+
     def onEnterState(self, payload: InGameStatePayload) -> None:
         pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
         pathLevel = os.path.join(pathStr)
@@ -401,11 +420,6 @@ class InGameState(State):
                                           128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
         self.goal_rect.y = -20  # 1/18 * self.game.screen.get_rect().h
-
-        self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                          40).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
-        self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
-        self.desc_rect.y = 110
 
         self.world_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                            32).render('World ' + str(self.current_world) + ' Level ' + str(self.current_level), True, (255, 255, 255))
