@@ -8,7 +8,7 @@ import sympy.core.numbers as spnumbers
 from constants import DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
 from levels import Card, evaluate_solution, load_level
 from states.payloads import InGameStatePayload
-from utils import resource_path
+from utils import get_max_levels_per_world, get_max_worlds, resource_path
 
 from .state import State
 
@@ -77,6 +77,7 @@ class CardUi:
         self.surf.blit(text_surf, text_rect)
 
         self.rect = pygame.Rect(x, y, size, size)
+        self.initPos = self.rect.topleft
         self.needUpdate = False
 
     def get_card_display(self) -> str:
@@ -171,7 +172,7 @@ class InGameState(State):
                     for card_ui in self.cards_ui:
                         if card_ui.rect.collidepoint(mouse_pos):
                             self.selected_card = card_ui
-                            self.selected_card.saveInitialPos(card_ui.rect.topleft)
+                            #self.selected_card.saveInitialPos(card_ui.rect.topleft)
                             self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                             break
 
@@ -199,6 +200,7 @@ class InGameState(State):
                     for card_ui in self.cards_ui:
                         if slot.cardInside(card_ui):
                             slot.setColor(GREEN_COLOR)
+                            card_ui.rect.center = slot.rect.center
                             slot.card = card_ui.card
                             break
                         else:
@@ -216,8 +218,21 @@ class InGameState(State):
         # If overflow, switch to next level
         
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
+            max_worlds = get_max_worlds()
+            max_levels = get_max_levels_per_world(self.current_world)
+
+            next_world = self.current_world
+            next_level = self.current_level + 1
+
+            if next_level > max_levels:
+                next_world += 1
+                next_level = 1
+
+            if next_world >= max_worlds:
+                self.game.switchState("CreditsState")
+
             self.game.switchState("InGameState", InGameStatePayload(
-                self.current_world, self.current_level+1))
+                next_world, next_level))
 
     def draw_total(self, screen: pygame.Surface) -> None:
         parsed_answer = "???"
@@ -280,17 +295,32 @@ class InGameState(State):
         slot_width = nb_cards * (slot_size + slot_offset)
         card_width = nb_cards * (card_size + card_offset)
 
+        nb_separator = 0
+        if slot_width > 1280:
+           nb_separator = 1280 // (slot_size + slot_offset)
+           slot_width = nb_separator * (slot_size + slot_offset)
+           card_width = nb_separator * (card_size + card_offset)
+        
+
         start_slot = np.array(self.game.screen.get_rect().center) - np.array((slot_width // 2, slot_size // 2))
         start_card = np.array(self.game.screen.get_rect().center) - \
             np.array((card_width // 2, -card_size // 2 - 20))
 
+        resetCount = 0
         for i, card in enumerate(self.level.cards):
             self.card_slots.append(CardSlotUi(
-                start_slot[0] + i * (slot_size + slot_offset), start_slot[1], slot_size))
-            self.cards_ui.append(
-                CardUi(card, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
+                start_slot[0] + (i - nb_separator * resetCount) * (slot_size + slot_offset), start_slot[1] + ((slot_offset + slot_size) * resetCount), slot_size))
+            if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
+                resetCount += 1
 
         self.totalHeight = self.card_slots[-1].rect.bottom
+
+        resetCount = 0
+        for i, card in enumerate(self.level.cards):
+            self.cards_ui.append(
+                CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((slot_offset + slot_size) * resetCount) + self.totalHeight + 50, card_size))
+            if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
+                resetCount += 1
 
     def getAnswer(self) -> float | None:
         solutions: list[Card] = []
