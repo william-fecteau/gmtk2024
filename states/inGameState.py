@@ -59,9 +59,8 @@ class CardSlotUi:
         self.surf.fill(color)
 
     def cardInside(self, card) -> bool:
-        if self.rect.contains(card.rect):
-            return True
-        return False
+        largeRect = self.rect.inflate(50, 50)
+        return largeRect.contains(card.rect)
 
 
 class CardUi:
@@ -78,6 +77,7 @@ class CardUi:
         self.surf.blit(text_surf, text_rect)
 
         self.rect = pygame.Rect(x, y, size, size)
+        self.needUpdate = False
 
     def get_card_display(self) -> str:
         value = self.card.value
@@ -101,8 +101,46 @@ class CardUi:
     def draw(self, surface: pygame.Surface):
         surface.blit(self.surf, self.rect.topleft)
 
+    def saveInitialPos(self, pos: tuple[int, int]) -> None:
+        self.initPos = pos
+
+    def setComebackPosition(self, pos: tuple[int, int]):
+        # self.rect.topleft = pos
+        self.needUpdate = True
+        print(self.rect.topleft[0])
+    # I'm sorry
+
+    def moveToInitPost(self):
+        newX = self.rect.topleft[0]
+        newY = self.rect.topleft[1]
+        if (abs(self.rect.topleft[0] - self.initPos[0]) < 10):
+            if (self.rect.topleft[0] > self.initPos[0]):
+                newX = self.rect.topleft[0] - (self.rect.topleft[0] - self.initPos[0])
+            if (self.rect.topleft[0] < self.initPos[0]):
+                newX = self.rect.topleft[0] + (self.rect.topleft[0] - self.initPos[0])
+
+        if (abs(self.rect.topleft[1] - self.initPos[1]) < 10):
+            if (self.rect.topleft[1] > self.initPos[1]):
+                newY = self.rect.topleft[1] - (self.rect.topleft[1] - self.initPos[1])
+            if (self.rect.topleft[1] < self.initPos[1]):
+                newY = self.rect.topleft[1] + (self.rect.topleft[1] - self.initPos[1])
+
+        if (newX > self.initPos[0]):
+            newX = self.rect.topleft[0] - 10
+        if (newY > self.initPos[1]):
+            newY = self.rect.topright[1] - 10
+        if (newX < self.initPos[0]):
+            newX = self.rect.topleft[0] + 10
+        if (newY < self.initPos[1]):
+            newY = self.rect.topleft[1] + 10
+        self.rect.topleft = (newX, newY)
+
+        if (self.rect.topleft == self.initPos):
+            self.needUpdate = False
+
 
 class InGameState(State):
+
     def __init__(self, game):
         super().__init__(game)
 
@@ -118,6 +156,7 @@ class InGameState(State):
                     for card_ui in self.cards_ui:
                         if card_ui.rect.collidepoint(mouse_pos):
                             self.selected_card = card_ui
+                            self.selected_card.saveInitialPos(card_ui.rect.topleft)
                             self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                             break
 
@@ -132,8 +171,16 @@ class InGameState(State):
                     self.help_ui.close()
 
             if event.type == pygame.MOUSEBUTTONUP:
-                # Card placement
-                self.selected_card = None
+                # self.selected_card = None
+                if self.selected_card != None:
+                    self.dontMove = False
+                    for slot in self.card_slots:
+                        if slot.cardInside(self.selected_card):
+                            self.dontMove = True
+
+                    if self.dontMove == False:
+                        self.selected_card.setComebackPosition(self.selected_card.initPos)
+                    self.selected_card = None
                 for slot in self.card_slots:
                     for card_ui in self.cards_ui:
                         if slot.cardInside(card_ui):
@@ -143,7 +190,6 @@ class InGameState(State):
                         else:
                             slot.setColor(DARK_GRAY)
                             slot.card = None
-
                 self.current_answer = self.getAnswer()
 
         if self.selected_card is not None:
