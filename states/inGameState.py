@@ -105,10 +105,7 @@ class CardUi:
         self.initPos = pos
 
     def setComebackPosition(self, pos: tuple[int, int]):
-        # self.rect.topleft = pos
         self.needUpdate = True
-        print(self.rect.topleft[0])
-    # I'm sorry
 
     def moveToInitPost(self):
         newX = self.rect.topleft[0]
@@ -171,7 +168,6 @@ class InGameState(State):
                     self.help_ui.close()
 
             if event.type == pygame.MOUSEBUTTONUP:
-                # self.selected_card = None
                 if self.selected_card != None:
                     self.dontMove = False
                     for slot in self.card_slots:
