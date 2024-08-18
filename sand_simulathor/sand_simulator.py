@@ -55,14 +55,11 @@ class SandSimulator:
         if not self.is_init:
             self.init_sand_bucket(surface)
         if len(self.allelements) / self.MAX_NUM_PARTICLES * 100.0 < overflow_ammount:
-            print("producing")
             if not self.bucket_on:
                 self.set_bucket_bottom(True, surface)
                 self.bucket_on = True
             for _ in range(3):
                 self.draw_sand(Sand,random.randint(0,128),0,self.pensize, surface)
         if self.bucket_on and len(self.allelements) / self.MAX_NUM_PARTICLES * 100.0 > overflow_ammount + 2.0:
-            print("removing")
             self.set_bucket_bottom(False, surface)
             self.bucket_on = False
-        print(len(self.allelements) / self.MAX_NUM_PARTICLES * 100)
