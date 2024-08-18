@@ -1,3 +1,4 @@
+from cutscenes.cutsceneManager import CutsceneManager
 from sand_simulathor.sand_simulator import SandSimulator
 import os
 
@@ -295,6 +296,9 @@ class InGameState(State):
         else: overflow_ammount = 0.0
         self.sand_ui.draw(overflow_ammount, screen)
 
+        test = CutsceneManager()
+        test.DisplayCustcene(screen, 1) # TODO RM
+
         self.sand_ui.update()
         for card_slot in self.card_slots:
             card_slot.draw(screen)
@@ -351,7 +355,7 @@ class InGameState(State):
                 resetCount += 1
 
         resetCount = 0
-        for i, card in enumerate(self.level.cards):           
+        for i, card in enumerate(self.level.cards):
             self.cards_ui.append(
                 CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((card_offset + card_size) * resetCount) + self.card_slots[-1].rect.bottom + 20, card_size))
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:

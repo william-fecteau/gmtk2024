@@ -1,5 +1,5 @@
 from constants import TARGET_FPS
-from cutscenes.cutscene1 import Cutscene1
+from cutscenes.cutsceneWorld1 import CutsceneWorld1
 from utils import resource_path
 import pygame
 import sys
@@ -14,19 +14,17 @@ class CutsceneManager():
         self.largeFont = pygame.font.Font(resource_path(fontRelativePath), 72)
         self.currentFrame = 0
 
-        self.cutscenes = [
-            Cutscene1(self)
-        ]
+        self.cutscenes = {
+            CutsceneWorld1.Id: CutsceneWorld1(self)
+        }
 
-    def DisplayCustcene(self, screen, cutsceneId):
+    def DisplayCustcene(self, screen : pygame.Surface, cutsceneId : int):
         while True:
             if (pygame.event.peek(pygame.QUIT)):
                 pygame.quit()
                 sys.exit()
 
-            for cutscene in self.cutscenes:
-                if (cutscene.id == cutsceneId):
-                    cutscene.Draw(screen)
+            self.cutscenes[cutsceneId].Draw(screen)
 
             pygame.display.flip()
             self.clock.tick(TARGET_FPS)
