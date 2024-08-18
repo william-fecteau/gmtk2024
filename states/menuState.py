@@ -38,9 +38,9 @@ class MenuState (State):
         self.menu.draw(self.surf)
 
         self.surf.blit(self.bigSnakeFont.render(
-            "Schhhnake", True, GREEN_COLOR), (150, 50))
+            "Overflow", True, GREEN_COLOR), (150, 50))
         self.surf.blit(self.smolSnakeFont.render(
-            "A game where a snake eats balls", True, GREEN_COLOR), (150, 125))
+            "Number get big", True, GREEN_COLOR), (150, 125))
         self.surf.blit(self.smolSnakeFont.render("Centering text is hard",
                        True, GREEN_COLOR), (width-450, height-50))
 

@@ -2,6 +2,7 @@ from math import floor
 
 import pygame
 import pygame_menu
+import pygame_menu.themes
 
 from constants import BLACK, EMERALD, GREEN_COLOR, SCREEN_SIZE
 from states.payloads import InGameStatePayload
@@ -17,7 +18,8 @@ class LevelSelectState (State):
         self.backgroundSnake = pygame.image.load(resource_path('./res/MenuImg/MenuBackground.png'))
         self.cool_snake = pygame.image.load(resource_path('./res/shnake.png'))
         self.bigSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 64)
-        self.smolSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
+        self.smolSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 30)
+        self.smollestSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
 
         self.setupMenu()
 
@@ -53,7 +55,7 @@ class LevelSelectState (State):
 
         cool_theme = pygame_menu.themes.THEME_GREEN.copy()  # type: ignore
         cool_theme.background_color = BLACK
-        cool_theme.widget_font = self.smolSnakeFont
+        cool_theme.widget_font = self.smollestSnakeFont
         cool_theme.widget_font_color = EMERALD
         cool_theme.selection_color = GREEN_COLOR
         cool_theme.widget_offset = (0, 200)
@@ -67,7 +69,7 @@ class LevelSelectState (State):
 
         level_counter = 1
         for i in range(get_max_worlds()):
-            self.menu.add.label("World " + str(i))
+            self.menu.add.label("WORLD " + str(i))
             max_levels = get_max_levels_per_world(i)
 
             for j in range(max_levels):
