@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pygame
 import sympy.core.numbers as spnumbers
+from sympy import false, true
 
 from constants import DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
 from levels import Card, evaluate_solution, load_level
@@ -236,6 +237,11 @@ class InGameState(State):
         elif self.help_ui.close_rect.collidepoint(mouse_pos):
             self.help_ui.close()
 
+        # Next Button
+        if self.completed:
+            if self.next_button_rect.collidepoint(mouse_pos):
+                self.go_next_level()
+
     def handle_mouse_up(self):
         if self.selected_card != None:
             pygame.mixer.Sound.play(self.card_drop)
@@ -274,8 +280,11 @@ class InGameState(State):
 
         self.current_answer = self.getAnswer()
 
-    def level_completed(self):
+    def level_completed(self) -> None:
         pygame.mixer.Sound.play(self.level_clear)
+        self.completed = true
+
+    def go_next_level(self) -> None:
         max_worlds = get_max_worlds()
         max_levels = get_max_levels_per_world(self.current_world)
 
@@ -290,6 +299,7 @@ class InGameState(State):
             self.game.switchState("CreditsState")
 
         self.game.switchState("InGameState", InGameStatePayload(next_world, next_level))
+        
 
     def getAnswer(self) -> float | None:
         solutions: list[Card] = []
@@ -325,6 +335,9 @@ class InGameState(State):
 
         self.draw_total(screen)
 
+        if self.completed:
+            self.draw_next(screen)
+
         self.draw_help_ui(screen)
 
     def draw_total(self, screen: pygame.Surface) -> None:
@@ -353,6 +366,19 @@ class InGameState(State):
         screen.blit(help_surface, self.help_btn_rect)
 
         self.help_ui.draw(screen)
+
+    def draw_next(self, screen: pygame.Surface) -> None:
+    
+        surf = pygame.Surface((150, 80))
+        buttonImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
+        #surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
+        surf.fill((147, 147, 147))
+
+        next_button_text = pygame.font.Font(resource_path(
+            './res/TTOctosquaresTrialRegular.ttf'), 48).render("Next", True, (0, 0, 0))
+        text_rect = next_button_text.get_rect(center=surf.get_rect().center)
+        surf.blit(next_button_text, text_rect)
+        screen.blit(surf, self.next_button_rect)
 
     # ==============================================================================================================
     # State management
@@ -397,6 +423,9 @@ class InGameState(State):
         self.world_rect = self.world_text.get_rect(bottomright=self.game.screen.get_rect().bottomright)
         self.world_rect.x -= 15
         self.world_rect.y -= 10
+
+        self.next_button_rect = pygame.Rect(self.game.screen.get_rect().right - 200, self.game.screen.get_rect().bottom - 150, 150, 80)
+        self.completed = false
 
         slot_size = 100
         slot_offset = 20
