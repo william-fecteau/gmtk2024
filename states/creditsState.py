@@ -2,7 +2,6 @@ from constants import GREEN_COLOR, TARGET_FPS
 from states.menuState import MenuState
 from utils import resource_path
 from states.state import State
-from typing import NamedTuple
 from random import randint
 import pygame
 import os
@@ -29,7 +28,7 @@ class CreditsState(State):
                 gamerNames.append(gamerName)
                 self.gamers.append(Gamer(len(self.gamers), self, gamerName))
 
-    def onEnterState(self, payload: NamedTuple) -> None:
+    def onEnterState(self, payload) -> None:
         for gamer in self.gamers:
             gamer.UpdateRandoms()
     
