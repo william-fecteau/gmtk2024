@@ -1,5 +1,5 @@
 {
     "nbBitsToOverflow": 16,
     "cards": ["10.01", "10^", "10^0", "-10^0", "-", "-", "+", "/", "!", "(", ")", "(", ")"],
-    "hint": "If only you could get one of those as an whole number..."
+    "hint": "If only you could get one of those as a whole number..."
   }

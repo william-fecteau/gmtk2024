@@ -1,4 +1,3 @@
-import os
 
 import numpy as np
 import pygame
@@ -329,7 +328,6 @@ class InGameState(State):
             next_level = 1
             pygame.mixer.Sound.play(self.next_world_sfx)
 
-
         if next_world >= max_worlds:
             self.game.switchState("CreditsState")
 
@@ -462,12 +460,11 @@ class InGameState(State):
     # ==============================================================================================================
 
     def onEnterState(self, payload: InGameStatePayload) -> None:
-        pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
-        pathLevel = os.path.join(pathStr)
+        pathStr = resource_path(f"res/worlds/{payload.world}/{payload.level}.json")
 
         self.current_world = payload.world
         self.current_level = payload.level
-        self.level = load_level(pathLevel)
+        self.level = load_level(pathStr)
 
         self.tutorial_ui = None
         if self.current_world == 0 and self.current_level == 1:
