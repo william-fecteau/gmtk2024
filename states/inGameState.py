@@ -516,4 +516,4 @@ class InGameState(State):
                 CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((card_offset + card_size) * resetCount) + self.card_slots[-1].rect.bottom + 20, card_size))
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
                 resetCount += 1
-                resetCount += 1
+        
