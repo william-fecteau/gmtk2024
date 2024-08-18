@@ -84,9 +84,9 @@ class CardUi:
         self.card_text = self.get_card_display()
 
         self.lenght = 48
-        if self.card_text.__len__() > 3:
-            self.lenght = 24
-        if self.card_text.__len__() > 5:
+        if self.card_text.__len__() >= 3:
+            self.lenght = 22
+        if self.card_text.__len__() >= 5:
             self.lenght = 18
 
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
