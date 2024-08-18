@@ -1,20 +1,15 @@
-
 import os
-
 import numpy as np
 import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
-
-from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
+from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE, WORLD_COLOR
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
 from states.payloads import InGameStatePayload
 from utils import get_max_levels_per_world, get_max_worlds, resource_path
-
 from .state import State
-
 
 class HelpUi:
     def __init__(self, help_text: str):
@@ -183,8 +178,15 @@ class CardUi:
 
 
 class SandUi:
-    def __init__(self):
-        self.sim = SandSimulator()
+    def __init__(self, currentWorld: int):
+        color = 0,0,0
+        colorStr = "WORLD_" + str(currentWorld) + "_COLOR"
+        try:
+            color = WORLD_COLOR.get(colorStr)
+        except:
+            color = 0,0,0
+
+        self.sim = SandSimulator(color)
 
     def update(self):
         self.sim.update_particles()
@@ -466,7 +468,7 @@ class InGameState(State):
             self.cutsceneManager.QueueCutscene(payload.world)
 
         self.help_ui = HelpUi(self.level.hint)
-        self.sand_ui = SandUi()
+        self.sand_ui = SandUi(self.current_world)
 
     def onExitState(self) -> None:
         pass
