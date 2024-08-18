@@ -13,7 +13,7 @@ class MenuState (State):
 
     def __init__(self, game):
         super().__init__(game)
-        self.title = "0verfl0w"
+        self.title = "0verflow"
         width, height = SCREEN_SIZE
         self.surf = pygame.Surface(SCREEN_SIZE)
         self.backgroundSnake = pygame.image.load(resource_path('./res/MenuImg/MenuBackground.png'))
@@ -53,7 +53,7 @@ class MenuState (State):
                 self.title = self.title[0:-1] + "oW" 
 
     def menuAction(self) -> None:
-        self.title = "0verfl0w"
+        self.title = "0verflow"
         self.game.switchState(
             "InGameState", InGameStatePayload(0, 1))
 
