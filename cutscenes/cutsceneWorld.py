@@ -6,10 +6,10 @@ class CutsceneWorld(Cutscene):
     def __init__(self, manager, currentWorldNumber : int):
         super().__init__(manager, currentWorldNumber)
         self.InitTitles(currentWorldNumber)
-        self.animationStartStep = 1.2 * TARGET_CUTSCENE_FPS
-        self.animationEndStep = 4 * TARGET_CUTSCENE_FPS
+        self.animationStartStep = 0.4 * TARGET_CUTSCENE_FPS
+        self.animationEndStep = 3 * TARGET_CUTSCENE_FPS
         self.animationSteps = self.animationEndStep - self.animationStartStep
-        self.cutsceneEndStep = 6 * TARGET_CUTSCENE_FPS
+        self.cutsceneEndStep = 5.5 * TARGET_CUTSCENE_FPS
         self.currentStep = 0
 
     def InitTitles(self, worldNumber : int):
@@ -17,9 +17,9 @@ class CutsceneWorld(Cutscene):
         self.nextWorldNumber = worldNumber + 1
         worldBits = 2 ** (worldNumber + 1)
         nextWorldBits = 2 ** (self.nextWorldNumber + 1)
-        self.currentWorldTitle = "World " + str(worldNumber)
+        self.currentWorldTitle = "World " + str(worldNumber - 1)
         self.currentWorldSubTitle = str(worldBits) + "-bit Integer"
-        self.nextWorldTitle = "World " + str(self.nextWorldNumber)
+        self.nextWorldTitle = "World " + str(self.nextWorldNumber - 1)
         self.nextWorldSubTitle = str(nextWorldBits) + "-bit Integer"
 
     def GetPreviousCutscene(self) -> Cutscene:
