@@ -78,11 +78,11 @@ class CardUi:
 
         self.surf = pygame.Surface((size, size))
         self.isHover = False
-        #self.surf.fill((147, 147, 147))
+        # self.surf.fill((147, 147, 147))
         self.cardImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
         self.cardImageHover = pygame.image.load(resource_path('./res/carteV1.png')).convert_alpha()
         self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
-        
+
         self.card_text = self.get_card_display()
 
         self.lenght = 48
@@ -232,14 +232,14 @@ class InGameState(State):
         # If overflow, switch to next level
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
             self.level_completed()
-    
+
     def is_over_card(self, mouse_pos: tuple[int, int]):
         for card_ui in self.cards_ui:
             if card_ui.rect.collidepoint(mouse_pos):
                 card_ui.isHover = True
             else:
                 card_ui.isHover = False
-    
+
     def handle_mouse_down(self):
         mouse_pos = pygame.mouse.get_pos()
 
@@ -326,7 +326,6 @@ class InGameState(State):
             self.game.switchState("CreditsState")
 
         self.game.switchState("InGameState", InGameStatePayload(next_world, next_level))
-        
 
     def getAnswer(self) -> float | None:
         solutions: list[Card] = []
@@ -362,53 +361,13 @@ class InGameState(State):
 
         self.draw_total(screen)
 
-        self.draw_bite(screen)
-
         if self.completed:
             self.draw_next(screen)
 
         self.draw_help_ui(screen)
 
     def draw_total(self, screen: pygame.Surface) -> None:
-        parsed_answer = "???"
-        if self.current_answer is not None:
-            if isinstance(self.current_answer, spnumbers.Integer):
-                parsed_answer = f'{self.current_answer}'
-            else:
-                parsed_answer = f'{self.current_answer:.2f}'
-
-        self.total_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                           80).render(parsed_answer, True, (255, 255, 255))
-        self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
-        self.total_rect.y = int(1280 / 8)
-        screen.blit(self.total_text, self.total_rect)
-
-        screen.blit(self.goal_text, self.goal_rect)
-        screen.blit(self.world_text, self.world_rect)
-
-    def draw_help_ui(self, screen: pygame.Surface) -> None:
-        help_surface = pygame.font.Font(resource_path(
-            './res/TTOctosquaresTrialRegular.ttf'), 48).render("?", True, (255, 255, 255))
-        posHelpButtion = (screen.get_rect().bottomleft[0]+30, screen.get_rect().bottomleft[1]-20)
-        self.help_btn_rect = help_surface.get_rect(bottomleft=posHelpButtion)
-        screen.blit(help_surface, self.help_btn_rect)
-
-        self.help_ui.draw(screen)
-
-    def draw_next(self, screen: pygame.Surface) -> None:
-    
-        surf = pygame.Surface((150, 80))
-        buttonImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
-        #surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
-        surf.fill((147, 147, 147))
-
-        next_button_text = pygame.font.Font(resource_path(
-            './res/TTOctosquaresTrialRegular.ttf'), 48).render("Next", True, (0, 0, 0))
-        text_rect = next_button_text.get_rect(center=surf.get_rect().center)
-        surf.blit(next_button_text, text_rect)
-        screen.blit(surf, self.next_button_rect)
-
-    def draw_bite(self, screen):
+        # Choosing color
         color_gradient = [
             (255, 255, 255),
             (255, 211, 218),
@@ -424,19 +383,62 @@ class InGameState(State):
 
         value = self.current_answer if self.current_answer is not None else 0
 
-        color_index = int(value * 10 / (2 ** self.level.nb_bits_to_overflow - 1))
-        color_index = min(color_index, 9)
+        color_index = int(value * len(color_gradient) / (2 ** self.level.nb_bits_to_overflow - 1))
+        color_index = np.clip(color_index, 0, len(color_gradient) - 1)  # Just to be sure so it doesnt boom
         color = color_gradient[color_index]
 
-        binary_str = bin(int(value))[2:]
+        # Parsing answer to text
+        parsed_answer = "???"
+        if self.current_answer is not None:
+            if isinstance(self.current_answer, spnumbers.Integer):
+                parsed_answer = f'{self.current_answer}'
+            else:
+                parsed_answer = f'{self.current_answer:.2f}'
+
+        # Drawing total
+        self.total_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                           80).render(parsed_answer, True, color)
+        self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
+        self.total_rect.y = int(SCREEN_SIZE[1] / 6)
+
+        # Drawing binary representation
+        binary_str = "0"
+        if value >= 0:
+            binary_str = bin(int(value))[2:]
         binary_str = binary_str.zfill(self.level.nb_bits_to_overflow)
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           40).render(binary_str, True, color)
-        self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
-        self.desc_rect.y = 110
+        self.desc_rect = self.desc_goal.get_rect(center=self.total_rect.center)
+        self.desc_rect.move_ip(0, 50)
 
+        # Blitting everything
         screen.blit(self.desc_goal, self.desc_rect)
+        screen.blit(self.total_text, self.total_rect)
+        screen.blit(self.goal_text, self.goal_rect)
+        screen.blit(self.world_text, self.world_rect)
+
+    def draw_help_ui(self, screen: pygame.Surface) -> None:
+        help_surface = pygame.font.Font(resource_path(
+            './res/TTOctosquaresTrialRegular.ttf'), 48).render("?", True, (255, 255, 255))
+        posHelpButtion = (screen.get_rect().bottomleft[0]+30, screen.get_rect().bottomleft[1]-20)
+        self.help_btn_rect = help_surface.get_rect(bottomleft=posHelpButtion)
+        screen.blit(help_surface, self.help_btn_rect)
+
+        self.help_ui.draw(screen)
+
+    def draw_next(self, screen: pygame.Surface) -> None:
+
+        surf = pygame.Surface((150, 80))
+        buttonImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
+        # surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
+        surf.fill((147, 147, 147))
+
+        next_button_text = pygame.font.Font(resource_path(
+            './res/TTOctosquaresTrialRegular.ttf'), 48).render("Next", True, (0, 0, 0))
+        text_rect = next_button_text.get_rect(center=surf.get_rect().center)
+        surf.blit(next_button_text, text_rect)
+        screen.blit(surf, self.next_button_rect)
 
     # ==============================================================================================================
     # State management
@@ -478,7 +480,8 @@ class InGameState(State):
         self.world_rect.x -= 15
         self.world_rect.y -= 10
 
-        self.next_button_rect = pygame.Rect(self.game.screen.get_rect().right - 200, self.game.screen.get_rect().bottom - 150, 150, 80)
+        self.next_button_rect = pygame.Rect(self.game.screen.get_rect().right - 200,
+                                            self.game.screen.get_rect().bottom - 150, 150, 80)
         self.completed = false
 
         slot_size = 100
