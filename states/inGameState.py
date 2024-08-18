@@ -203,6 +203,7 @@ class InGameState(State):
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
         self.next_world_sfx = pygame.mixer.Sound(resource_path('./res/NextWorldSFX.mp3'))
         self.cutsceneManager = CutsceneManager()
+        
 
     # ==============================================================================================================
     # Update
@@ -482,7 +483,9 @@ class InGameState(State):
         self.sand_ui = SandUi(self.current_world)
 
     def onExitState(self) -> None:
-        pass
+        pygame.mixer.music.load(resource_path('./res/TitleTheme.mp3'))
+        pygame.mixer.music.set_volume(0.35)
+        pygame.mixer.music.play(-1)
 
     def init_card_slots(self):
         self.card_slots: list[CardSlotUi] = []
@@ -501,6 +504,10 @@ class InGameState(State):
 
         self.next_button_rect = pygame.Rect(self.game.screen.get_rect().right - 200,
                                             self.game.screen.get_rect().bottom - 150, 150, 80)
+        
+        pygame.mixer.music.load(resource_path('./res/MainThemeV3.mp3'))
+        pygame.mixer.music.set_volume(0.35)
+        pygame.mixer.music.play(-1)
         self.completed = false
 
         slot_size = 100
