@@ -307,7 +307,9 @@ class InGameState(State):
         self.current_answer = self.getAnswer()
 
     def level_completed(self) -> None:
-        pygame.mixer.Sound.play(self.level_clear)
+        if (not self.completed):
+            pygame.mixer.Sound.play(self.level_clear)
+
         self.completed = true
 
     def go_next_level(self) -> None:
