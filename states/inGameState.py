@@ -7,8 +7,7 @@ import sympy.core.numbers as spnumbers
 from sympy import false, true
 
 from constants import (DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE,
-                       WORLD_0_COLOR, WORLD_1_COLOR, WORLD_2_COLOR,
-                       WORLD_3_COLOR, WORLD_4_COLOR, WORLD_5_COLOR)
+                       WORLD_COLOR)
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
@@ -190,18 +189,11 @@ class CardUi:
 class SandUi:
     def __init__(self, currentWorld: int):
         color = 0,0,0
-        if(currentWorld == 0):
-            color = WORLD_0_COLOR
-        elif(currentWorld == 1):
-            color = WORLD_1_COLOR
-        elif(currentWorld == 2):
-            color = WORLD_2_COLOR
-        elif(currentWorld == 3):
-            color = WORLD_3_COLOR
-        elif(currentWorld == 4):
-            color = WORLD_4_COLOR
-        elif(currentWorld == 5):
-            color = WORLD_5_COLOR
+        colorStr = "WORLD_" + str(currentWorld) + "_COLOR"
+        try:
+            color = WORLD_COLOR.get(colorStr)
+        except:
+            color = 0,0,0
 
         self.sim = SandSimulator(color)
 
