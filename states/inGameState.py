@@ -75,8 +75,8 @@ class CardUi:
         self.card = card
 
         self.surf = pygame.Surface((size, size))
-        self.surf.fill((147, 147, 147))
-        self.cardImage = pygame.image.load(resource_path('./res/carteV1.png')).convert_alpha()
+        #self.surf.fill((147, 147, 147))
+        self.cardImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
         self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
 
         card_text = self.get_card_display()
