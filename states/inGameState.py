@@ -159,8 +159,8 @@ class SandUi:
     def update(self):
         self.sim.update_particles()
 
-    def draw(self, surface):
-        self.sim.draw_particles(70., surface)
+    def draw(self, overflow_ammount, surface):
+        self.sim.draw_particles(overflow_ammount, surface)
 
 
 
@@ -290,7 +290,10 @@ class InGameState(State):
         self.help_ui.draw(screen)
 
     def draw(self, screen) -> None:
-        self.sand_ui.draw(screen)
+        if (self.current_answer is not None):
+            overflow_ammount = self.current_answer * 100 / (2 ** self.level.nb_bits_to_overflow)
+        else: overflow_ammount = 0.0
+        self.sand_ui.draw(overflow_ammount, screen)
 
         self.sand_ui.update()
         for card_slot in self.card_slots:
