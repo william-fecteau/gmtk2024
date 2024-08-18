@@ -34,30 +34,27 @@ class Game:
 
     def gameLoop(self) -> None:
         while True:
-            try:
-                if (pygame.event.peek(pygame.QUIT)):
-                    pygame.quit()
-                    sys.exit()
+            if (pygame.event.peek(pygame.QUIT)):
+                pygame.quit()
+                sys.exit()
 
-                self.events = pygame.event.get()
+            self.events = pygame.event.get()
 
-                if self.nextState is not None:
-                    self.dicStates[self.curState].onExitState()
-                    self.curState = self.nextState
-                    self.dicStates[self.curState].onEnterState(self.nextStatePayload)
-                    self.nextState = None
-                    self.nextStatePayload = None
+            if self.nextState is not None:
+                self.dicStates[self.curState].onExitState()
+                self.curState = self.nextState
+                self.dicStates[self.curState].onEnterState(self.nextStatePayload)
+                self.nextState = None
+                self.nextStatePayload = None
 
-                self.screen.fill('black')
+            self.screen.fill('black')
 
-                self.dicStates[self.curState].update()
-                self.dicStates[self.curState].draw(self.screen)
+            self.dicStates[self.curState].update()
+            self.dicStates[self.curState].draw(self.screen)
 
-                pygame.display.flip()
+            pygame.display.flip()
 
-                self.clock.tick(TARGET_FPS)
-            except:
-                pass
+            self.clock.tick(TARGET_FPS)
 
     def switchState(self, newStateStr: str, payload: Optional[NamedTuple] = None) -> None:
         if self.nextState is None and newStateStr in self.dicStates:
