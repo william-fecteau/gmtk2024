@@ -121,7 +121,7 @@ def preprocess_solution(solution: list[Card]) -> list[Card]:
     # Sympy preprocess
     for card in solution_copy:
         card.value = card.value.replace('e', 'E').replace('Exp', 'exp')
-        card.value = card.value.replace('%', 'mod')
+        card.value = card.value.replace('mod', '%')
 
     # For cards that are functions, assume next card is the argument LGTM for now
     # e.g. 'sqrt' -> 'sqrt(' + next_card + ')'
@@ -189,6 +189,9 @@ def evaluate_solution(level: Level, solution: list[Card]) -> float:
 
     if value == sympy.zoo:
         raise ValueError('Division by zero')
+
+    if sympy.im(value) != 0:
+        raise ValueError('Imaginary number')
 
     return value
 
