@@ -383,8 +383,8 @@ class InGameState(State):
 
         value = self.current_answer if self.current_answer is not None else 0
 
-        color_index = int(value * 10 / (2 ** self.level.nb_bits_to_overflow - 1))
-        color_index = min(color_index, 9)
+        color_index = int(value * len(color_gradient) / (2 ** self.level.nb_bits_to_overflow - 1))
+        color_index = np.clip(color_index, 0, len(color_gradient) - 1)  # Just to be sure so it doesnt boom
         color = color_gradient[color_index]
 
         # Parsing answer to text
@@ -402,7 +402,9 @@ class InGameState(State):
         self.total_rect.y = int(SCREEN_SIZE[1] / 6)
 
         # Drawing binary representation
-        binary_str = bin(int(value))[2:]
+        binary_str = "0"
+        if value >= 0:
+            binary_str = bin(int(value))[2:]
         binary_str = binary_str.zfill(self.level.nb_bits_to_overflow)
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
