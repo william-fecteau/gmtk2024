@@ -1,4 +1,5 @@
 {
   "nbBitsToOverflow": 8,
-  "cards": ["3", "4", "16", "1", "1", "/", "/", "+", "*", "(", ")", "(", ")"]
+  "cards": ["3", "4", "16", "1", "1", "/", "/", "+", "*", "(", ")", "(", ")"],
+  "hint": "Two divisions can be used in combination"
 }

@@ -17,5 +17,6 @@
     "*",
     "+",
     "*"
-  ]
+  ],
+  "hint": "Small decimal numbers become big negative numbers thanks to logs"
 }

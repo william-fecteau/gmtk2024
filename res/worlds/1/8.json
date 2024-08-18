@@ -1,4 +1,5 @@
 {
   "nbBitsToOverflow": 8,
-  "cards": ["0", "exp(-256)", "ln", "-", "(", ")"]
+  "cards": ["0", "exp(-256)", "ln", "-", "(", ")"],
+  "hint": "Logarithms are the inverse operation of natural exponentials"
 }
