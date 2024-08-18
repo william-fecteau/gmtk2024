@@ -18,8 +18,8 @@ class MenuState (State):
         self.surf = pygame.Surface(SCREEN_SIZE)
         self.backgroundSnake = pygame.image.load(resource_path('./res/MenuImg/MenuBackground.png'))
         self.cool_snake = pygame.image.load(resource_path('./res/shnake.png'))
-        self.bigSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 72)
-        self.smolSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 24)
+        self.bigSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 72)
+        self.smolSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
         self.rows = 17
         self.columns = 17
         self.appleSpawn = 1
@@ -56,6 +56,9 @@ class MenuState (State):
     def levelSelect(self) -> None:
         self.game.switchState("LevelSelectState")
 
+    def credits(self) -> None:
+        self.game.switchState("CreditsState")
+
     def setupMenu(self) -> None:
         width, height = SCREEN_SIZE
 
@@ -72,6 +75,7 @@ class MenuState (State):
 
         self.menu.add.button('Play', self.menuAction)
         self.menu.add.button('Level Select', self.levelSelect)
+        self.menu.add.button('Credits', self.credits)
         self.menu.add.button('Quit', pygame_menu.events.EXIT)  # type: ignore
 
     def setRow(self, value: int) -> None:

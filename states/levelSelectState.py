@@ -11,6 +11,9 @@ from utils import resource_path
 
 
 class LevelSelectState (State):
+    LEVEL_WORLD_0 = 1
+    LEVEL_WORLD_1 = 10
+    LEVEL_WORLD_2 = 10
 
     def __init__(self, game):
         super().__init__(game)
@@ -19,8 +22,8 @@ class LevelSelectState (State):
         self.surf = pygame.Surface(SCREEN_SIZE)
         self.backgroundSnake = pygame.image.load(resource_path('./res/MenuImg/MenuBackground.png'))
         self.cool_snake = pygame.image.load(resource_path('./res/shnake.png'))
-        self.bigSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 64)
-        self.smolSnakeFont = pygame.font.Font(resource_path('./res/SnakeFont.ttf'), 24)
+        self.bigSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 64)
+        self.smolSnakeFont = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
 
         self.setupMenu()
 
@@ -40,16 +43,17 @@ class LevelSelectState (State):
         screen.blit(self.surf, (0, 0))
 
     def update(self) -> None:
+        for event in self.game.events:
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                self.game.switchState("MenuState")
         self.menu.update(self.game.events)
 
     def goToLevel(self, world: int, level: int) -> None:
-        print("world : " + str(world) + " level : " + str(level))
         self.game.switchState(
             "InGameState", InGameStatePayload(world, level)
         )
     def addButtonCalisse(self, world: int, level:int, totalLevelCount: int) -> None:
-        print("world : " + str(world) + " level : " + str(level))
-        self.menu.add.button("Level" + str(totalLevelCount), lambda: self.goToLevel(world, level))
+        self.menu.add.button("Level " + str(totalLevelCount), lambda: self.goToLevel(world, level))
 
     def setupMenu(self) -> None:
         width, height = SCREEN_SIZE
@@ -67,11 +71,24 @@ class LevelSelectState (State):
 
         compteur = 1
         for i in range(NB_WORLD):
-            self.menu.add.text_input("Monde " + str(i))
+            self.menu.add.label("World " + str(i))
+            maxValueWorld = self.getMaxLevelsWorld(i)
             for j in range(NB_LEVELS):
-                self.addButtonCalisse(i, j+1, compteur)
-                compteur += 1
+                # TODO need to take into account level numbers per worlds
+                if(maxValueWorld-1 >= j):
+                    self.addButtonCalisse(i, j+1, compteur)
+                    compteur += 1
+                
 
+    def getMaxLevelsWorld(self, worldNumber: int) -> int:
+        if(worldNumber == 0):
+            return int(self.LEVEL_WORLD_0)
+        elif(worldNumber == 1):
+            return int(self.LEVEL_WORLD_1)
+        elif(worldNumber == 2):
+            return int(self.LEVEL_WORLD_2)
+        return 10
+    
     def setRow(self, value: int) -> None:
         self.rows = floor(value)
 

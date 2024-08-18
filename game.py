@@ -4,13 +4,14 @@ from typing import NamedTuple, Optional
 import pygame
 
 from constants import SCREEN_SIZE, TARGET_FPS
-from states import InGameState, LevelSelectState, MenuState
+from states import CreditsState, InGameState, LevelSelectState, MenuState
 
 
 class Game:
     def __init__(self):
         pygame.init()
         pygame.font.init()
+        pygame.display.set_caption("Overflow")
 
         self.screen = pygame.display.set_mode(SCREEN_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)
 
@@ -18,7 +19,8 @@ class Game:
         self.dicStates = {
             InGameState.__name__: InGameState(self),
             MenuState.__name__: MenuState(self),
-            LevelSelectState.__name__: LevelSelectState(self)
+            LevelSelectState.__name__: LevelSelectState(self),
+            CreditsState.__name__: CreditsState(self)
         }
         self.curState = MenuState.__name__
         self.nextState = None
