@@ -560,8 +560,7 @@ class TutorialUi:
         self.cur_rect: pygame.Rect | None = None
 
     def redraw_surf(self):
-        self.surf = pygame.Surface((400, 100))
-        self.surf.fill((147, 147, 147))
+        self.surf = pygame.image.load(resource_path('./res/TextboxTutorial.png')).convert_alpha()
 
         button = pygame.Surface((75, 25))
         button.fill((0, 171, 255))
@@ -645,10 +644,5 @@ def drawText(surface, text, color, rect, font, aa=False, bkg=None):
 
         # remove the text we just blitted
         text = text[i:]
-
-    return text
-
-    # remove the text we just blitted
-    text = text[i:]
 
     return text
