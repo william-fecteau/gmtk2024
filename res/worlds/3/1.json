@@ -1,0 +1,5 @@
+{
+  "nbBitsToOverflow": 32,
+  "cards": ["5", "(-2^16)", "3", "mod", "^", "(", ")"],
+  "hint": "The modulo operator divides the first number by the other then outputs the remainder (the modulus)"
+}
