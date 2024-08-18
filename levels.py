@@ -20,6 +20,7 @@ class Level:
     cards: list[Card]
     min_cards: int
     max_cards: int
+    hint: str
 
 
 def is_float(string):
@@ -73,7 +74,11 @@ def load_level(level_path: str) -> Level:
         if min_cards > max_cards:
             raise ValueError(f'minCards is greater than maxCards for level {level_path}')
 
-        level = Level(nb_bits_to_overflow, cards, min_cards, max_cards)
+        hint = ''
+        if 'hint' in level_json:
+            hint = level_json['hint']
+
+        level = Level(nb_bits_to_overflow, cards, min_cards, max_cards, hint)
 
     return level
 
