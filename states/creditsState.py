@@ -1,10 +1,13 @@
-from constants import GREEN_COLOR, TARGET_FPS
-from states.menuState import MenuState
-from utils import resource_path
-from states.state import State
-from random import randint, shuffle
-import pygame
 import os
+from random import randint, shuffle
+
+import pygame
+
+from constants import TARGET_FPS, WHITE
+from states.menuState import MenuState
+from states.state import State
+from utils import resource_path
+
 
 class CreditsState(State):
     def __init__(self, game):
@@ -91,4 +94,4 @@ class Gamer:
 
     def DrawName(self, screen, posX, posY):
         position = (posX + 175, posY + self.state.screenSize[1] / 32 + 45)
-        screen.blit(self.state.font.render(self.name, True, GREEN_COLOR), position)
+        screen.blit(self.state.font.render(self.name, True, WHITE), position)

@@ -41,8 +41,8 @@ class MenuState (State):
             "Overflow", True, WHITE), (150, 50))
         self.surf.blit(self.smolSnakeFont.render(
             "Number get big", True, WHITE), (150, 125))
-        self.surf.blit(self.smolSnakeFont.render("Centering text is hard",
-                       True, WHITE), (width-450, height-50))
+        #self.surf.blit(self.smolSnakeFont.render("Centering text is hard",
+        #               True, WHITE), (width-450, height-50))
 
         screen.blit(self.surf, (0, 0))
 
