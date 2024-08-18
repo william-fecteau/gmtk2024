@@ -16,5 +16,6 @@
     "+",
     "+",
     "^"
-  ]
+  ],
+  "hint": "Parentheses are still applied first!"
 }
