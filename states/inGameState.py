@@ -202,6 +202,7 @@ class InGameState(State):
         self.card_drop = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Drop.mp3'))
         self.card_pickup = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Pickup.mp3'))
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
+        self.next_world_sfx = pygame.mixer.Sound(resource_path('./res/NextWorldSFX.mp3'))
         self.cutsceneManager = CutsceneManager()
 
     # ==============================================================================================================
@@ -325,6 +326,8 @@ class InGameState(State):
         if next_level > max_levels:
             next_world += 1
             next_level = 1
+            pygame.mixer.Sound.play(self.next_world_sfx)
+
 
         if next_world >= max_worlds:
             self.game.switchState("CreditsState")
@@ -545,6 +548,7 @@ TUTORIAL_STEPS = [
     "Those are the cards you can combine to overflow the target",
     "Drag or double-click the cards in these slots to make an equation",
     "The evaluated equation will show up here along with it's binary representation",
+    "If you need help, click on the '?' button to get an hint. Good luck!"
 ]
 
 
@@ -597,6 +601,9 @@ class TutorialUi:
             toplefty = self.game_state.card_slots[0].rect.centery - height // 2
         elif self.current_step == 3:
             toplefty = self.game_state.total_rect.centery - height // 2
+        elif self.current_step == 4:
+            topleftx = self.game_state.help_btn_rect.topleft[0]
+            toplefty = self.game_state.help_btn_rect.topleft[1] - height - 10
 
         self.cur_rect = self.surf.get_rect(topleft=(topleftx, toplefty))
 
