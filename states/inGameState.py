@@ -69,7 +69,7 @@ class CardUi:
     def __init__(self, card: Card, x: int, y: int, size: int):
         self.card = card
 
-        self.surf = pygame.Surface((size, size))
+        self.surf = pygame.Surface((size, size), pygame.SRCALPHA)
         self.isHover = False
         # self.surf.fill((147, 147, 147))
         self.cardImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
@@ -117,6 +117,7 @@ class CardUi:
             self.surf.blit(self.cardImageHover, pygame.Rect(0, 0, 80, 80))
         else:
             self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
+
         self.card_text = self.get_card_display()
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                      self.lenght).render(self.card_text, True, (0, 0, 0))
