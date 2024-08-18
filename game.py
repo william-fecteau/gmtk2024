@@ -18,7 +18,6 @@ class Game:
         pygame.mixer.music.load(utils.resource_path('./res/MainThemeV3.mp3'))
         pygame.mixer.music.set_volume(0.35)
         pygame.mixer.music.play(-1)
-        
 
         # States
         self.dicStates = {
@@ -35,27 +34,30 @@ class Game:
 
     def gameLoop(self) -> None:
         while True:
-            if (pygame.event.peek(pygame.QUIT)):
-                pygame.quit()
-                sys.exit()
+            try:
+                if (pygame.event.peek(pygame.QUIT)):
+                    pygame.quit()
+                    sys.exit()
 
-            self.events = pygame.event.get()
+                self.events = pygame.event.get()
 
-            if self.nextState is not None:
-                self.dicStates[self.curState].onExitState()
-                self.curState = self.nextState
-                self.dicStates[self.curState].onEnterState(self.nextStatePayload)
-                self.nextState = None
-                self.nextStatePayload = None
+                if self.nextState is not None:
+                    self.dicStates[self.curState].onExitState()
+                    self.curState = self.nextState
+                    self.dicStates[self.curState].onEnterState(self.nextStatePayload)
+                    self.nextState = None
+                    self.nextStatePayload = None
 
-            self.screen.fill('black')
+                self.screen.fill('black')
 
-            self.dicStates[self.curState].update()
-            self.dicStates[self.curState].draw(self.screen)
+                self.dicStates[self.curState].update()
+                self.dicStates[self.curState].draw(self.screen)
 
-            pygame.display.flip()
+                pygame.display.flip()
 
-            self.clock.tick(TARGET_FPS)
+                self.clock.tick(TARGET_FPS)
+            except:
+                pass
 
     def switchState(self, newStateStr: str, payload: Optional[NamedTuple] = None) -> None:
         if self.nextState is None and newStateStr in self.dicStates:
