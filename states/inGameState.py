@@ -57,20 +57,41 @@ class CardUi:
         self.initPos = pos
     
     def setComebackPosition(self, pos: tuple[int, int]):
-        #self.rect.topleft = pos
         self.needUpdate = True
         print(self.rect.topleft[0])
+
+        distance = 10
+        distanceX = abs(self.rect.topleft[0] - self.initPos[0])
+        distanceY = abs(self.rect.topleft[1] - self.initPos[1])
+        
     #I'm sorry
     def moveToInitPost(self):
+        distance = 10
+        distanceX = abs(self.rect.topleft[0] - self.initPos[0])
+        distanceY = abs(self.rect.topleft[1] - self.initPos[1])
+
+        if(distanceX == 0):
+            ratioDistanceY = distanceY/1
+            parcoursY = distance*ratioDistanceY
+        else:
+            ratioDistanceY = distanceY/distanceX
+            parcoursY = distance*ratioDistanceY
+        if(distanceY == 0):
+            ratioDistanceX = distanceX/1
+            parcoursX = distance*ratioDistanceX
+        else:
+            ratioDistanceX = distanceX/distanceY
+            parcoursX = distance*ratioDistanceX
+
         newX = self.rect.topleft[0]
         newY = self.rect.topleft[1]
-        if(abs(self.rect.topleft[0] - self.initPos[0]) < 10):
+        if(abs(self.rect.topleft[0] - self.initPos[0]) < parcoursX):
             if(self.rect.topleft[0] > self.initPos[0]):
                 newX = self.rect.topleft[0] - (self.rect.topleft[0] - self.initPos[0])
             if(self.rect.topleft[0] < self.initPos[0]):
                 newX = self.rect.topleft[0] + (self.rect.topleft[0] - self.initPos[0])
 
-        if(abs(self.rect.topleft[1] - self.initPos[1]) < 10):
+        if(abs(self.rect.topleft[1] - self.initPos[1]) < parcoursY):
             if(self.rect.topleft[1] > self.initPos[1]):
                 newY = self.rect.topleft[1] - (self.rect.topleft[1] - self.initPos[1])
             if(self.rect.topleft[1] < self.initPos[1]):
@@ -78,14 +99,15 @@ class CardUi:
 
         
         if(newX > self.initPos[0]):
-            newX = self.rect.topleft[0] -10
+            newX = self.rect.topleft[0] - parcoursX
         if(newY > self.initPos[1]):
-            newY = self.rect.topright[1] -10
+            newY = self.rect.topright[1] - parcoursY
         if(newX < self.initPos[0]):
-            newX = self.rect.topleft[0] + 10
+            newX = self.rect.topleft[0] + parcoursX
         if(newY < self.initPos[1]):
-            newY = self.rect.topleft[1] + 10
-        self.rect.topleft = (newX, newY)
+            newY = self.rect.topleft[1] + parcoursY
+
+        self.rect.topleft = (int(newX), int(newY))
 
         if(self.rect.topleft == self.initPos):
             self.needUpdate = False
@@ -114,7 +136,6 @@ class InGameState(State):
                         self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                         break
         else:
-            #self.selected_card = None
             if self.selected_card != None:
                 self.dontMove = False
                 for slot in self.card_slots:
@@ -140,7 +161,6 @@ class InGameState(State):
 
         for card in self.cards_ui:
             if card.needUpdate == True:
-                print("pepi")
                 card.moveToInitPost()
 
     def draw(self, screen) -> None:
