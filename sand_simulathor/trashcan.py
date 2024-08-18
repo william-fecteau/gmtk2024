@@ -2,15 +2,14 @@ import random
 
 import pygame
 
-from constants import PURPLE
-
 aircolor = (0,0,0)    
 scale = 20
 
 
 class Particle:
-    def __init__(self,x,y,allelements,SURFACE):
+    def __init__(self,x,y,allelements,SURFACE, colorWorld):
         #allelements is a REFERENCE to a dictionary containing all element instances
+        self.color = colorWorld
         self.changed = {}
         self.x = x
         self.y = y
@@ -55,16 +54,16 @@ class Particle:
             self.draw(oldx,oldy,aircolor) #delete old pixel
             (self.x,self.y) = (newx,newy)
             self.allelements[(newx,newy)] = self
-            self.draw(newx,newy,PURPLE)
+            self.draw(newx,newy,self.color)
             self.changed[(oldx,oldy)] = True
             self.changed[(newx,newy)] = True
             return True
         return False #otherwise return "failed" boolean
         
 class Metal(Particle): #metal just sits there and doesnt move
-    def __init__(self,x,y,allelements,SURFACE):
-        self.color = PURPLE
-        Particle.__init__(self,x,y,allelements,SURFACE) 
+    def __init__(self,x,y,allelements,SURFACE, colorWorld):
+        self.color = colorWorld
+        Particle.__init__(self,x,y,allelements,SURFACE, colorWorld) 
         self.draw(self.x, self.y,self.color) 
         
     def update(self):
@@ -73,10 +72,10 @@ class Metal(Particle): #metal just sits there and doesnt move
             
     
 class Sand(Particle): #sand behaves like a very viscous liquid, BUT is CLASSED as a solid
-    def __init__(self,x,y,allelements,SURFACE):
-        self.color = PURPLE
+    def __init__(self,x,y,allelements,SURFACE, colorWorld):
+        self.color = colorWorld
         self.flowchance = 0.03 #chance to behave as liquid per tick (CAN CHANGE IF WET)
-        Particle.__init__(self,x,y,allelements,SURFACE)
+        Particle.__init__(self,x,y,allelements,SURFACE, self.color)
         self.draw(self.x, self.y,self.color) 
         
         
@@ -99,11 +98,11 @@ class Sand(Particle): #sand behaves like a very viscous liquid, BUT is CLASSED a
             updates += 2
             
 class NullElement(Particle): #this placeholder sits at (None,None) and does NOTHING
-    def __init__(self,allelements,SURFACE):
-        self.color = None
+    def __init__(self,allelements,SURFACE, colorWorld):
+        self.color = colorWorld
         self.x = None
         self.y = None
-        Particle.__init__(self,self.x,self.y,allelements,SURFACE)
+        Particle.__init__(self,self.x,self.y,allelements,SURFACE, colorWorld)
     def update(self):
         pass
         

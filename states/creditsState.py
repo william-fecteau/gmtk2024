@@ -1,13 +1,10 @@
 import os
-from random import randint, shuffle
-
 import pygame
-
+from random import randint, shuffle
 from constants import TARGET_FPS, WHITE
 from states.menuState import MenuState
 from states.state import State
 from utils import resource_path
-
 
 class CreditsState(State):
     def __init__(self, game):

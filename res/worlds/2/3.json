@@ -1,0 +1,5 @@
+{
+    "nbBitsToOverflow": 16,
+    "cards": ["2.5", "2", "3", "1", "+", "+", "(", ")", "*", "+", "+", "e", "!", "/"],
+    "hint": "Factorials only work with integers"
+  }

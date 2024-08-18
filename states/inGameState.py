@@ -1,20 +1,15 @@
-
 import os
-
 import numpy as np
 import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
-
-from constants import DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
+from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHTER_GRAY, SCREEN_SIZE, WORLD_COLOR
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
 from states.payloads import InGameStatePayload
 from utils import get_max_levels_per_world, get_max_worlds, resource_path
-
 from .state import State
-
 
 class HelpUi:
     def __init__(self, help_text: str):
@@ -22,25 +17,22 @@ class HelpUi:
         width *= 0.8
         height *= 0.2
         self.surf = pygame.Surface((width, height))
-        self.surf.fill(LIGHT_GRAY)
+        self.surf.fill(LIGHTER_GRAY)
         self.surf.set_alpha(253)
 
-        font_big = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 48)
         font_smoll = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
-
-        close_surf = font_big.render("X", True, (0, 0, 0))
-        self.close_rect = close_surf.get_rect(topleft=(width - 50, 10))
-        self.surf.blit(close_surf, self.close_rect)
 
         self.is_open = False
         display = pygame.display.get_surface().get_rect()
         self.help_surf_rect = self.surf.get_rect(bottom=display.bottom, centerx=display.centerx)
         self.help_surf_rect.move_ip(0, -30)
 
-        self.close_rect.move_ip(self.help_surf_rect.topleft)
+        textLines = help_text.split("\n")
 
-        text_surf = font_smoll.render(help_text, True, (0, 0, 0))
-        self.surf.blit(text_surf, text_surf.get_rect(center=self.surf.get_rect().center))
+        for i in range(0, len(textLines)):
+            textSurface : pygame.Surface = font_smoll.render(textLines[i], True, BLACK)
+            textPosition = textSurface.get_rect(center = self.surf.get_rect().center).move(0, (i - 1) * 25)
+            self.surf.blit(textSurface, textPosition)
 
     def draw(self, screen: pygame.Surface):
         if self.is_open:
@@ -186,8 +178,15 @@ class CardUi:
 
 
 class SandUi:
-    def __init__(self):
-        self.sim = SandSimulator()
+    def __init__(self, currentWorld: int):
+        color = 0,0,0
+        colorStr = "WORLD_" + str(currentWorld) + "_COLOR"
+        try:
+            color = WORLD_COLOR.get(colorStr)
+        except:
+            color = 0,0,0
+
+        self.sim = SandSimulator(color)
 
     def update(self):
         self.sim.update_particles()
@@ -263,8 +262,6 @@ class InGameState(State):
                 self.help_ui.open()
         elif self.help_ui.is_open and not self.help_ui.help_surf_rect.collidepoint(mouse_pos):
             self.help_ui.close()
-        elif self.help_ui.close_rect.collidepoint(mouse_pos):
-            self.help_ui.close()
 
         # Next Button
         if self.completed:
@@ -313,7 +310,9 @@ class InGameState(State):
         self.current_answer = self.getAnswer()
 
     def level_completed(self) -> None:
-        pygame.mixer.Sound.play(self.level_clear)
+        if (not self.completed):
+            pygame.mixer.Sound.play(self.level_clear)
+
         self.completed = true
 
     def go_next_level(self) -> None:
@@ -480,7 +479,7 @@ class InGameState(State):
             self.cutsceneManager.QueueCutscene(payload.world)
 
         self.help_ui = HelpUi(self.level.hint)
-        self.sand_ui = SandUi()
+        self.sand_ui = SandUi(self.current_world)
 
     def onExitState(self) -> None:
         pass

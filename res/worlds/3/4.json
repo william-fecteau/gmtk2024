@@ -1,0 +1,19 @@
+{
+  "nbBitsToOverflow": 32,
+  "cards": [
+    "e^",
+    "mod(-33)",
+    "2",
+    "-1",
+    "3",
+    "-",
+    "*",
+    "(",
+    ")",
+    "(",
+    ")",
+    "(",
+    ")"
+  ],
+  "hint": "You might need two negatives here"
+}

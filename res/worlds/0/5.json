@@ -1,5 +1,5 @@
 {
   "nbBitsToOverflow": 4,
   "cards": ["2", "2", "3", "*", "^"],
-  "hint": "Exponents are applied before multiplication"
+  "hint": "Exponents are applied before multiplications"
 }
