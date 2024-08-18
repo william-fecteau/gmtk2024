@@ -84,7 +84,6 @@ class CardUi:
                                      48).render(card_text, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
-        
 
         self.rect = pygame.Rect(x, y, size, size)
         self.initPos = self.rect.topleft
