@@ -1,5 +1,5 @@
 {
   "nbBitsToOverflow": 8,
-  "cards": ["1", "1", "4", "exp", "exp", "+", "*", "-", "/", "(", ")"],
-  "hint": "Exp will apply to the next following character, or parentheses"
+  "cards": ["1", "1", "4", "e^", "e^", "+", "*", "-", "/", "(", ")"],
+  "hint": "e^ will apply to the next following character, or parentheses"
 }

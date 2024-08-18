@@ -1,5 +1,5 @@
 {
   "nbBitsToOverflow": 8,
-  "cards": ["3*e", "exp(-3)", "exp(2)", "ln", "+", "-", "*", "/", "(", ")"],
+  "cards": ["3*e", "e^(-3)", "e^2", "ln", "+", "-", "*", "/", "(", ")"],
   "hint": "You don't have to use all the cards"
 }
