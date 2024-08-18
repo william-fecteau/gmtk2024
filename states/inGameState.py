@@ -199,7 +199,8 @@ class InGameState(State):
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore
-
+        elif self.selected_card is None:
+            self.is_over_card(mouse_pos)
         # Card snap to initial position
         for card in self.cards_ui:
             if card.needUpdate == True:
@@ -208,7 +209,12 @@ class InGameState(State):
         # If overflow, switch to next level
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
             self.level_completed()
-
+    
+    def is_over_card(self, mouse_pos: tuple[int, int]):
+        for card_ui in self.cards_ui:
+            if card_ui.rect.collidepoint(mouse_pos):
+                print("Monkey")
+    
     def handle_mouse_down(self):
         mouse_pos = pygame.mouse.get_pos()
 
