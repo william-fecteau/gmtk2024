@@ -2,15 +2,14 @@ import random
 
 import pygame
 
-from constants import PURPLE
-
 aircolor = (0,0,0)    
 scale = 20
 
 
 class Particle:
-    def __init__(self,x,y,allelements,SURFACE):
+    def __init__(self,x,y,allelements,SURFACE, colorWorld):
         #allelements is a REFERENCE to a dictionary containing all element instances
+        self.color = colorWorld
         self.changed = {}
         self.x = x
         self.y = y
@@ -55,16 +54,16 @@ class Particle:
             self.draw(oldx,oldy,aircolor) #delete old pixel
             (self.x,self.y) = (newx,newy)
             self.allelements[(newx,newy)] = self
-            self.draw(newx,newy,PURPLE)
+            self.draw(newx,newy,self.color)
             self.changed[(oldx,oldy)] = True
             self.changed[(newx,newy)] = True
             return True
         return False #otherwise return "failed" boolean
         
 class Metal(Particle): #metal just sits there and doesnt move
-    def __init__(self,x,y,allelements,SURFACE):
-        self.color = PURPLE
-        Particle.__init__(self,x,y,allelements,SURFACE) 
+    def __init__(self,x,y,allelements,SURFACE, colorWorld):
+        self.color = colorWorld
+        Particle.__init__(self,x,y,allelements,SURFACE, colorWorld) 
         self.draw(self.x, self.y,self.color) 
         
     def update(self):
@@ -73,36 +72,37 @@ class Metal(Particle): #metal just sits there and doesnt move
             
     
 class Sand(Particle): #sand behaves like a very viscous liquid, BUT is CLASSED as a solid
-    def __init__(self,x,y,allelements,SURFACE):
-        self.color = PURPLE
+    def __init__(self,x,y,allelements,SURFACE, colorWorld):
+        self.color = colorWorld
         self.flowchance = 0.03 #chance to behave as liquid per tick (CAN CHANGE IF WET)
-        Particle.__init__(self,x,y,allelements,SURFACE)
+        Particle.__init__(self,x,y,allelements,SURFACE, self.color)
         self.draw(self.x, self.y,self.color) 
         
         
     def update(self):
         if self.checkkill(self.x,self.y):
             return
+        
         updates = 0 #start with zero actions
             
         flowdirection = random.randint(0,1) * 2 - 1 #returns +-1, decides if particle moves left or right
         if random.random() > self.flowchance: #LARGE chance to not flow at all for sand
             flowdirection = 0 #i.e: dont flow   
         while updates < 2:
-            if self.goto( self.x, self.y + 2): #if space is available to fall down 2 spaces
-                updates += 2
-            elif self.goto( self.x, self.y + 1):
+            #if self.goto( self.x, self.y + 2): #if space is available to fall down 2 spaces
+            #    updates += 2
+            if self.goto( self.x, self.y + 1):
                 updates +=1 #log one cycle as complete
             if self.goto(self.x + flowdirection, self.y): #if space is available to go sideways
                 pass
             updates += 2
             
 class NullElement(Particle): #this placeholder sits at (None,None) and does NOTHING
-    def __init__(self,allelements,SURFACE):
-        self.color = None
+    def __init__(self,allelements,SURFACE, colorWorld):
+        self.color = colorWorld
         self.x = None
         self.y = None
-        Particle.__init__(self,self.x,self.y,allelements,SURFACE)
+        Particle.__init__(self,self.x,self.y,allelements,SURFACE, colorWorld)
     def update(self):
         pass
         
