@@ -76,12 +76,15 @@ class CardUi:
 
         self.surf = pygame.Surface((size, size))
         self.surf.fill((147, 147, 147))
+        self.cardImage = pygame.image.load(resource_path('./res/carteV1.png')).convert_alpha()
+        self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
 
         card_text = self.get_card_display()
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                      48).render(card_text, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
+        
 
         self.rect = pygame.Rect(x, y, size, size)
         self.initPos = self.rect.topleft
