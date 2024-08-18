@@ -1,4 +1,5 @@
 {
   "nbBitsToOverflow": 4,
-  "cards": ["5", "5", "-5", "-1", "-1", "*", "-", "-", "-"]
+  "cards": ["5", "5", "-5", "-1", "-1", "*", "-", "-", "-"],
+  "hint": "Minus signs can come in different forms"
 }

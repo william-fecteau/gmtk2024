@@ -1,4 +1,3 @@
-from sand_simulathor.sand_simulator import SandSimulator
 import os
 
 import numpy as np
@@ -7,6 +6,7 @@ import sympy.core.numbers as spnumbers
 
 from constants import DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
 from levels import Card, evaluate_solution, load_level
+from sand_simulathor.sand_simulator import SandSimulator
 from states.payloads import InGameStatePayload
 from utils import get_max_levels_per_world, get_max_worlds, resource_path
 
@@ -14,24 +14,30 @@ from .state import State
 
 
 class HelpUi:
-    def __init__(self, cards: list[Card]):
+    def __init__(self, help_text: str):
         width, height = SCREEN_SIZE
         width *= 0.8
-        height *= 0.8
+        height *= 0.2
         self.surf = pygame.Surface((width, height))
         self.surf.fill(LIGHT_GRAY)
         self.surf.set_alpha(253)
 
-        font = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 48)
+        font_big = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 48)
+        font_smoll = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
 
-        close_surf = font.render("X", True, (0, 0, 0))
+        close_surf = font_big.render("X", True, (0, 0, 0))
         self.close_rect = close_surf.get_rect(topleft=(width - 50, 10))
         self.surf.blit(close_surf, self.close_rect)
 
         self.is_open = False
-        self.help_surf_rect = self.surf.get_rect(center=pygame.display.get_surface().get_rect().center)
+        display = pygame.display.get_surface().get_rect()
+        self.help_surf_rect = self.surf.get_rect(bottom=display.bottom, centerx=display.centerx)
+        self.help_surf_rect.move_ip(0, -30)
 
         self.close_rect.move_ip(self.help_surf_rect.topleft)
+
+        text_surf = font_smoll.render(help_text, True, (0, 0, 0))
+        self.surf.blit(text_surf, text_surf.get_rect(center=self.surf.get_rect().center))
 
     def draw(self, screen: pygame.Surface):
         if self.is_open:
@@ -69,13 +75,16 @@ class CardUi:
         self.card = card
 
         self.surf = pygame.Surface((size, size))
-        self.surf.fill((147, 147, 147))
+        #self.surf.fill((147, 147, 147))
+        self.cardImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
+        self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
 
         card_text = self.get_card_display()
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                      48).render(card_text, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
+        
 
         self.rect = pygame.Rect(x, y, size, size)
         self.initPos = self.rect.topleft
@@ -146,11 +155,14 @@ class CardUi:
             newX = self.rect.topleft[0] + parcoursX
         if (newY < self.initPos[1]):
             newY = self.rect.topleft[1] + parcoursY
-
-        self.rect.topleft = (int(newX), int(newY))
+        try:
+            self.rect.topleft = (int(newX), int(newY))
+        except:
+            self.rect.topleft = self.initPos
 
         if (self.rect.topleft == self.initPos):
             self.needUpdate = False
+
 
 class SandUi:
     def __init__(self):
@@ -163,136 +175,145 @@ class SandUi:
         self.sim.draw_particles(overflow_ammount, surface)
 
 
-
 class InGameState(State):
-
     def __init__(self, game):
         super().__init__(game)
+        self.background = pygame.image.load(resource_path('./res/MenuImg/LevelBackground.png')).convert_alpha()
         self.card_drop = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Drop.mp3'))
         self.card_pickup = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Pickup.mp3'))
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
 
+    # ==============================================================================================================
+    # Update
+    # ==============================================================================================================
     def update(self) -> None:
-        mouse_pos = pygame.mouse.get_pos()
+        # Event handling
         self.last_mouse_move = pygame.mouse.get_rel()
         for event in self.game.events:
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.game.switchState("MenuState")
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Card selection
-                if self.selected_card is None:
-                    for card_ui in self.cards_ui:
-                        if card_ui.rect.collidepoint(mouse_pos):
-                            self.selected_card = card_ui
-                            pygame.mixer.Sound.play(self.card_pickup)
-                            #self.selected_card.saveInitialPos(card_ui.rect.topleft)
-                            self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
-                            break
-
-                # Help UI
-                if self.help_btn_rect.collidepoint(mouse_pos):
-                    if self.help_ui.is_open:
-                        self.help_ui.close()
-                    else:
-                        self.help_ui.open()
-
-                if self.help_ui.close_rect.collidepoint(mouse_pos):
-                    self.help_ui.close()
-
+                self.handle_mouse_down()
             if event.type == pygame.MOUSEBUTTONUP:
-                if self.selected_card != None:
-                    pygame.mixer.Sound.play(self.card_drop)
-                    self.dontMove = False
-                    for slot in self.card_slots:
-                        if slot.cardInside(self.selected_card):
-                            self.dontMove = True
-                            if slot.card != None and slot.cardUI != None:
-                                slot.cardUI.setComebackPosition()
-                                self.selected_card.rect.center = slot.rect.center
-                                slot.card = self.selected_card.card
-                                slot.cardUI = self.selected_card
-                            if slot.card == None and slot.cardUI == None:
-                                self.selected_card.rect.center = slot.rect.center
+                self.handle_mouse_up()
 
-                                slot.card = self.selected_card.card
-                                slot.cardUI = self.selected_card
-
-                    if self.dontMove == False:
-                        self.selected_card.setComebackPosition()
-                    self.selected_card = None
-                for slot in self.card_slots:
-                    for card_ui in self.cards_ui:
-                        if slot.cardInside(card_ui):
-                            slot.setColor(GREEN_COLOR)
-                            if slot.card == None and slot.cardUI == None:
-                                card_ui.rect.center = slot.rect.center
-
-                                slot.card = card_ui.card
-                                slot.cardUI = card_ui
-                            break
-                        else:
-                            slot.setColor(DARK_GRAY)
-                            slot.card = None
-                            slot.cardUI = None
-                self.current_answer = self.getAnswer()
-
+        # Card dragging
+        mouse_pos = pygame.mouse.get_pos()
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore
 
+        # Card snap to initial position
         for card in self.cards_ui:
             if card.needUpdate == True:
                 card.moveToInitPost()
+
         # If overflow, switch to next level
-
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
-            pygame.mixer.Sound.play(self.level_clear)
-            max_worlds = get_max_worlds()
-            max_levels = get_max_levels_per_world(self.current_world)
+            self.level_completed()
 
-            next_world = self.current_world
-            next_level = self.current_level + 1
+    def handle_mouse_down(self):
+        mouse_pos = pygame.mouse.get_pos()
 
-            if next_level > max_levels:
-                next_world += 1
-                next_level = 1
+        # Card selection
+        if self.selected_card is None:
+            for card_ui in self.cards_ui:
+                if card_ui.rect.collidepoint(mouse_pos):
+                    self.selected_card = card_ui
+                    pygame.mixer.Sound.play(self.card_pickup)
+                    # self.selected_card.saveInitialPos(card_ui.rect.topleft)
+                    self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
+                    break
 
-            if next_world >= max_worlds:
-                self.game.switchState("CreditsState")
-
-            self.game.switchState("InGameState", InGameStatePayload(
-                next_world, next_level))
-
-    def draw_total(self, screen: pygame.Surface) -> None:
-        parsed_answer = "???"
-        if self.current_answer is not None:
-            if isinstance(self.current_answer, spnumbers.Integer):
-                parsed_answer = f'{self.current_answer}'
+        # Help UI
+        if self.help_btn_rect.collidepoint(mouse_pos):
+            if self.help_ui.is_open:
+                self.help_ui.close()
             else:
-                parsed_answer = f'{self.current_answer:.2f}'
+                self.help_ui.open()
+        elif self.help_ui.is_open and not self.help_ui.help_surf_rect.collidepoint(mouse_pos):
+            self.help_ui.close()
+        elif self.help_ui.close_rect.collidepoint(mouse_pos):
+            self.help_ui.close()
 
-        self.total_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                           80).render(parsed_answer, True, (255, 255, 255))
-        self.total_rect = self.total_text.get_rect()
-        self.total_rect.x = int(1280 * 3 / 4)
-        self.total_rect.y = self.goal_rect.y + 30
-        screen.blit(self.total_text, self.total_rect)
+    def handle_mouse_up(self):
+        if self.selected_card != None:
+            pygame.mixer.Sound.play(self.card_drop)
+            self.dontMove = False
+            for slot in self.card_slots:
+                if slot.cardInside(self.selected_card):
+                    self.dontMove = True
+                    if slot.card != None and slot.cardUI != None:
+                        slot.cardUI.setComebackPosition()
+                        self.selected_card.rect.center = slot.rect.center
+                        slot.card = self.selected_card.card
+                        slot.cardUI = self.selected_card
+                    if slot.card == None and slot.cardUI == None:
+                        self.selected_card.rect.center = slot.rect.center
 
-        screen.blit(self.goal_text, self.goal_rect)
-        screen.blit(self.desc_goal, self.desc_rect)
+                        slot.card = self.selected_card.card
+                        slot.cardUI = self.selected_card
 
-    def draw_help_ui(self, screen: pygame.Surface) -> None:
-        help_surface = pygame.font.Font(resource_path(
-            './res/TTOctosquaresTrialRegular.ttf'), 48).render("?", True, (255, 255, 255))
-        self.help_btn_rect = help_surface.get_rect(bottomleft=screen.get_rect().bottomleft)
-        screen.blit(help_surface, self.help_btn_rect)
+            if self.dontMove == False:
+                self.selected_card.setComebackPosition()
+            self.selected_card = None
+        for slot in self.card_slots:
+            for card_ui in self.cards_ui:
+                if slot.cardInside(card_ui):
+                    slot.setColor(GREEN_COLOR)
+                    if slot.card == None and slot.cardUI == None:
+                        card_ui.rect.center = slot.rect.center
 
-        self.help_ui.draw(screen)
+                        slot.card = card_ui.card
+                        slot.cardUI = card_ui
+                    break
+                else:
+                    slot.setColor(DARK_GRAY)
+                    slot.card = None
+                    slot.cardUI = None
 
+        self.current_answer = self.getAnswer()
+
+    def level_completed(self):
+        pygame.mixer.Sound.play(self.level_clear)
+        max_worlds = get_max_worlds()
+        max_levels = get_max_levels_per_world(self.current_world)
+
+        next_world = self.current_world
+        next_level = self.current_level + 1
+
+        if next_level > max_levels:
+            next_world += 1
+            next_level = 1
+
+        if next_world >= max_worlds:
+            self.game.switchState("CreditsState")
+
+        self.game.switchState("InGameState", InGameStatePayload(next_world, next_level))
+
+    def getAnswer(self) -> float | None:
+        solutions: list[Card] = []
+        for slot in self.card_slots:
+            if slot.card is not None:
+                solutions.append(slot.card)
+
+        try:
+            value = evaluate_solution(self.level, solutions)  # type: ignore
+        except Exception as e:
+            return None
+
+        return value
+
+    # ==============================================================================================================
+    # Drawing
+    # ==============================================================================================================
     def draw(self, screen) -> None:
+        screen.blit(self.background, pygame.Rect(0, 0, 1280, 720))
+
         if (self.current_answer is not None):
             overflow_ammount = self.current_answer * 100 / (2 ** self.level.nb_bits_to_overflow)
-        else: overflow_ammount = 0.0
+        else:
+            overflow_ammount = 0.0
         self.sand_ui.draw(overflow_ammount, screen)
 
         self.sand_ui.update()
@@ -306,6 +327,56 @@ class InGameState(State):
 
         self.draw_help_ui(screen)
 
+    def draw_total(self, screen: pygame.Surface) -> None:
+        parsed_answer = "???"
+        if self.current_answer is not None:
+            if isinstance(self.current_answer, spnumbers.Integer):
+                parsed_answer = f'{self.current_answer}'
+            else:
+                parsed_answer = f'{self.current_answer:.2f}'
+
+        self.total_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                           80).render(parsed_answer, True, (255, 255, 255))
+        self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
+        self.total_rect.y = int(1280 / 8)
+        screen.blit(self.total_text, self.total_rect)
+
+        screen.blit(self.goal_text, self.goal_rect)
+        screen.blit(self.desc_goal, self.desc_rect)
+        screen.blit(self.world_text, self.world_rect)
+
+    def draw_help_ui(self, screen: pygame.Surface) -> None:
+        help_surface = pygame.font.Font(resource_path(
+            './res/TTOctosquaresTrialRegular.ttf'), 48).render("?", True, (255, 255, 255))
+        posHelpButtion = (screen.get_rect().bottomleft[0]+30, screen.get_rect().bottomleft[1]-20)
+        self.help_btn_rect = help_surface.get_rect(bottomleft=posHelpButtion)
+        screen.blit(help_surface, self.help_btn_rect)
+
+        self.help_ui.draw(screen)
+
+    # ==============================================================================================================
+    # State management
+    # ==============================================================================================================
+    def onEnterState(self, payload: InGameStatePayload) -> None:
+        pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
+        pathLevel = os.path.join(pathStr)
+
+        self.current_world = payload.world
+        self.current_level = payload.level
+        self.level = load_level(pathLevel)
+
+        self.current_answer: float | None = None
+        self.selected_card: CardUi | None = None
+        self.mouse_click_offset = (0, 0)
+
+        self.init_card_slots()
+
+        self.help_ui = HelpUi(self.level.hint)
+
+        self.sand_ui = SandUi()
+
+    def onExitState(self) -> None:
+        pass
 
     def init_card_slots(self):
         self.card_slots: list[CardSlotUi] = []
@@ -314,12 +385,18 @@ class InGameState(State):
         self.goal_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
-        self.goal_rect.y = 1/18 * self.game.screen.get_rect().h
+        self.goal_rect.y = -20  # 1/18 * self.game.screen.get_rect().h
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                          64).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
+                                          40).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
         self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
-        self.desc_rect.y = 7/32 * self.game.screen.get_rect().h
+        self.desc_rect.y = 110
+
+        self.world_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                           32).render('World ' + str(self.current_world) + ' Level ' + str(self.current_level), True, (255, 255, 255))
+        self.world_rect = self.world_text.get_rect(bottomright=self.game.screen.get_rect().bottomright)
+        self.world_rect.x -= 15
+        self.world_rect.y -= 10
 
         slot_size = 100
         slot_offset = 20
@@ -356,38 +433,3 @@ class InGameState(State):
                 CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((card_offset + card_size) * resetCount) + self.card_slots[-1].rect.bottom + 20, card_size))
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
                 resetCount += 1
-
-
-    def getAnswer(self) -> float | None:
-        solutions: list[Card] = []
-        for slot in self.card_slots:
-            if slot.card is not None:
-                solutions.append(slot.card)
-
-        try:
-            value = evaluate_solution(self.level, solutions)  # type: ignore
-        except Exception as e:
-            return None
-
-        return value
-
-    def onEnterState(self, payload: InGameStatePayload) -> None:
-        pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
-        pathLevel = os.path.join(pathStr)
-
-        self.current_world = payload.world
-        self.current_level = payload.level
-        self.level = load_level(pathLevel)
-
-        self.current_answer: float | None = None
-        self.selected_card: CardUi | None = None
-        self.mouse_click_offset = (0, 0)
-
-        self.init_card_slots()
-
-        self.help_ui = HelpUi(self.level.cards)
-
-        self.sand_ui = SandUi()
-
-    def onExitState(self) -> None:
-        pass
