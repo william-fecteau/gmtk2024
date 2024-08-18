@@ -1,0 +1,5 @@
+{
+  "nbBitsToOverflow": 32,
+  "cards": ["1", "3", "5", "mod-8", "mod-5", "-", "(", ")", "(", ")"],
+  "hint": "Astucious use of the negative modulos could be useful here"
+}

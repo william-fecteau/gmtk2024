@@ -1,0 +1,5 @@
+{
+  "nbBitsToOverflow": 32,
+  "cards": ["(-14)", "(-4)", "^33", "mod5", "+", "(", ")", "(", ")"],
+  "hint": "Using a modulo operator on a negative number will still output a positive remainder"
+}
