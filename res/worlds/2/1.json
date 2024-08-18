@@ -1,0 +1,5 @@
+{
+    "nbBitsToOverflow": 16,
+    "cards": ["exp(-256)", "256", "-1/256", "-1/256", "ln", "ln", "(", ")", "*", "*", "*"],
+    "hint": "Logarithms cannot compute negative numbers"
+  }
