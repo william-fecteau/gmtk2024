@@ -1,5 +1,5 @@
 {
   "nbBitsToOverflow": 8,
-  "cards": ["sqrt(31)", "exp", "(", ")"],
+  "cards": ["sqrt(31)", "e^", "(", ")"],
   "hint": "e, Euler's number, is a mathematical constant approximately equal to 2.71828\nIt is often used as a base for exponential functions"
 }
