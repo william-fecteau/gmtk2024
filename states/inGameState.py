@@ -159,6 +159,9 @@ class InGameState(State):
 
     def __init__(self, game):
         super().__init__(game)
+        self.card_drop = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Drop.mp3'))
+        self.card_pickup = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Pickup.mp3'))
+        self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
 
     def update(self) -> None:
         mouse_pos = pygame.mouse.get_pos()
@@ -172,6 +175,7 @@ class InGameState(State):
                     for card_ui in self.cards_ui:
                         if card_ui.rect.collidepoint(mouse_pos):
                             self.selected_card = card_ui
+                            pygame.mixer.Sound.play(self.card_pickup)
                             #self.selected_card.saveInitialPos(card_ui.rect.topleft)
                             self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                             break
@@ -188,6 +192,7 @@ class InGameState(State):
 
             if event.type == pygame.MOUSEBUTTONUP:
                 if self.selected_card != None:
+                    pygame.mixer.Sound.play(self.card_drop)
                     self.dontMove = False
                     for slot in self.card_slots:
                         if slot.cardInside(self.selected_card):
@@ -218,6 +223,7 @@ class InGameState(State):
         # If overflow, switch to next level
         
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
+            pygame.mixer.Sound.play(self.level_clear)
             max_worlds = get_max_worlds()
             max_levels = get_max_levels_per_world(self.current_world)
 
