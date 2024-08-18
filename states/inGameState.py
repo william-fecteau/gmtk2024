@@ -66,7 +66,7 @@ class CardSlotUi:
         self.surf.fill(color)
 
     def cardInside(self, card) -> bool:
-        largeRect = self.rect.inflate(50, 50)
+        largeRect = self.rect.inflate(100, 100)
         return largeRect.contains(card.rect)
 
 
