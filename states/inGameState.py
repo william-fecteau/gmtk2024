@@ -643,10 +643,3 @@ def drawText(surface, text, color, rect, font, aa=False, bkg=None):
         text = text[i:]
 
     return text
-
-    # remove the text we just blitted
-    text = text[i:]
-
-    return text
-
-    return text
