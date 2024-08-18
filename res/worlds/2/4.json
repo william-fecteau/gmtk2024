@@ -1,0 +1,5 @@
+{
+    "nbBitsToOverflow": 16,
+    "cards": ["-100", "2", "3", "-1", "(", ")", "(1/41!)", "(1/42)", "ln", "*", "*", "*", "*", "+", "+"],
+    "hint": "This 1/41! is such a small number, maybe you can use it for something? "
+  }
