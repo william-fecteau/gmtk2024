@@ -1,3 +1,5 @@
+from typing import Any
+
 TARGET_FPS = 60
 TARGET_CUTSCENE_FPS = 50
 SCREEN_SIZE = 1280, 720
@@ -8,21 +10,18 @@ BLACK = 0, 0, 0
 LIGHT_BLACK = 10, 10, 10
 EMERALD = 68, 207, 108
 LIGHT_GRAY = 125, 125, 125
-LIGHTER_GRAY = 150, 150, 150
 DARK_GRAY = 46, 46, 46
 PURPLE = (255,0,255)
 WHITE = (240,240,240)
 
-# Colors World
-WORLD_COLOR = {
-    "WORLD_0_COLOR" : (5, 173, 22),
-    "WORLD_1_COLOR" : (50, 199, 184),
-    "WORLD_2_COLOR" : (200,80,230),
-    "WORLD_3_COLOR" : (207, 35, 138),
-    "WORLD_4_COLOR" : (230, 18, 47),
-    "WORLD_5_COLOR" : (95, 131, 222)
+WORLD_COLORS : dict[int, Any] = {
+    0: (5, 173, 22),
+    1: (50, 199, 184),
+    2: (200,80,230),
+    3: (207, 35, 138),
+    4: (230, 18, 47),
+    5: (95, 131, 222)
 }
-
 
 NB_LEVELS = 10
 NB_WORLD = 3
