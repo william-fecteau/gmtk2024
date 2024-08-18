@@ -1,4 +1,3 @@
-import os
 
 import numpy as np
 import pygame
@@ -66,7 +65,7 @@ class CardSlotUi:
         self.surf.fill(color)
 
     def cardInside(self, card) -> bool:
-        largeRect = self.rect.inflate(50, 50)
+        largeRect = self.rect.inflate(100, 100)
         return largeRect.contains(card.rect)
 
 
@@ -84,9 +83,9 @@ class CardUi:
         self.card_text = self.get_card_display()
 
         self.lenght = 48
-        if self.card_text.__len__() > 3:
-            self.lenght = 24
-        if self.card_text.__len__() > 5:
+        if self.card_text.__len__() >= 3:
+            self.lenght = 22
+        if self.card_text.__len__() >= 5:
             self.lenght = 18
 
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
@@ -204,6 +203,7 @@ class InGameState(State):
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
         self.next_world_sfx = pygame.mixer.Sound(resource_path('./res/NextWorldSFX.mp3'))
         self.cutsceneManager = CutsceneManager()
+        
 
     # ==============================================================================================================
     # Update
@@ -328,7 +328,6 @@ class InGameState(State):
             next_level = 1
             pygame.mixer.Sound.play(self.next_world_sfx)
 
-
         if next_world >= max_worlds:
             self.game.switchState("CreditsState")
 
@@ -445,8 +444,11 @@ class InGameState(State):
         self.help_ui.draw(screen)
 
     def draw_next(self, screen: pygame.Surface) -> None:
+        color = WORLD_COLORS.get(self.current_world, BLACK)
 
         surf = pygame.Surface((150, 80))
+
+        surf.fill(color)
         buttonImage = pygame.image.load(resource_path('./res/NextLevelButton.png'))
         surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
 
@@ -461,12 +463,11 @@ class InGameState(State):
     # ==============================================================================================================
 
     def onEnterState(self, payload: InGameStatePayload) -> None:
-        pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
-        pathLevel = os.path.join(pathStr)
+        pathStr = resource_path(f"res/worlds/{payload.world}/{payload.level}.json")
 
         self.current_world = payload.world
         self.current_level = payload.level
-        self.level = load_level(pathLevel)
+        self.level = load_level(pathStr)
 
         self.tutorial_ui = None
         if self.current_world == 0 and self.current_level == 1:
@@ -485,7 +486,9 @@ class InGameState(State):
         self.sand_ui = SandUi(self.current_world)
 
     def onExitState(self) -> None:
-        pass
+        pygame.mixer.music.load(resource_path('./res/TitleTheme.mp3'))
+        pygame.mixer.music.set_volume(0.35)
+        pygame.mixer.music.play(-1)
 
     def init_card_slots(self):
         self.card_slots: list[CardSlotUi] = []
@@ -504,6 +507,10 @@ class InGameState(State):
 
         self.next_button_rect = pygame.Rect(self.game.screen.get_rect().right - 200,
                                             self.game.screen.get_rect().bottom - 150, 150, 80)
+        
+        pygame.mixer.music.load(resource_path('./res/MainThemeV3.mp3'))
+        pygame.mixer.music.set_volume(0.35)
+        pygame.mixer.music.play(-1)
         self.completed = false
 
         slot_size = 100

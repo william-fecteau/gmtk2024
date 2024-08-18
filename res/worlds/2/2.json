@@ -1,5 +1,5 @@
 {
     "nbBitsToOverflow": 16,
     "cards": ["3", "3", "!", "(", ")", "*"],
-    "hint": "A factorial (!) is the product of every integer less or equal to the number 5! = 5x4x3x2x1"
+    "hint": "A factorial (!) is the product of every integer less than\nor equal to the number 5! = 5x4x3x2x1"
   }
