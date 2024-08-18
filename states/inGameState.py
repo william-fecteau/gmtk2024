@@ -84,8 +84,15 @@ class CardUi:
         self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
 
         self.card_text = self.get_card_display()
+
+        self.lenght = 48
+        if self.card_text.__len__() > 3:
+            self.lenght = 24
+        if self.card_text.__len__() > 5:
+            self.lenght = 18
+
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                     48).render(self.card_text, True, (0, 0, 0))
+                                     self.lenght).render(self.card_text, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
 
@@ -119,7 +126,7 @@ class CardUi:
             self.surf.blit(self.cardImage, pygame.Rect(0, 0, 80, 80))
         self.card_text = self.get_card_display()
         text_surf = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                     48).render(self.card_text, True, (0, 0, 0))
+                                     self.lenght).render(self.card_text, True, (0, 0, 0))
         text_rect = text_surf.get_rect(center=self.surf.get_rect().center)
         self.surf.blit(text_surf, text_rect)
 
