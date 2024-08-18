@@ -46,6 +46,7 @@ class SandSimulator:
             self.allelements[(self.MAX_X_VALUE_MAYBE,y)] = Metal(self.MAX_X_VALUE_MAYBE,y,self.allelements,surface)
 
     def update_particles(self):
+        compteur = 0
         for element in list(self.allelements.keys()):
             try:
                 self.allelements[element].update()

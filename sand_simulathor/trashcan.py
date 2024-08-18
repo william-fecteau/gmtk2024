@@ -83,15 +83,16 @@ class Sand(Particle): #sand behaves like a very viscous liquid, BUT is CLASSED a
     def update(self):
         if self.checkkill(self.x,self.y):
             return
+        
         updates = 0 #start with zero actions
             
         flowdirection = random.randint(0,1) * 2 - 1 #returns +-1, decides if particle moves left or right
         if random.random() > self.flowchance: #LARGE chance to not flow at all for sand
             flowdirection = 0 #i.e: dont flow   
         while updates < 2:
-            if self.goto( self.x, self.y + 2): #if space is available to fall down 2 spaces
-                updates += 2
-            elif self.goto( self.x, self.y + 1):
+            #if self.goto( self.x, self.y + 2): #if space is available to fall down 2 spaces
+            #    updates += 2
+            if self.goto( self.x, self.y + 1):
                 updates +=1 #log one cycle as complete
             if self.goto(self.x + flowdirection, self.y): #if space is available to go sideways
                 pass
