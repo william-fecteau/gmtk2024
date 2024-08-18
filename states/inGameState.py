@@ -257,17 +257,32 @@ class InGameState(State):
         slot_width = nb_cards * (slot_size + slot_offset)
         card_width = nb_cards * (card_size + card_offset)
 
+        nb_separator = 0
+        if slot_width > 1280:
+           nb_separator = 1280 // (slot_size + slot_offset)
+           slot_width = nb_separator * (slot_size + slot_offset)
+           card_width = nb_separator * (card_size + card_offset)
+        
+
         start_slot = np.array(self.game.screen.get_rect().center) - np.array((slot_width // 2, slot_size // 2))
         start_card = np.array(self.game.screen.get_rect().center) - \
             np.array((card_width // 2, -card_size // 2 - 20))
 
+        resetCount = 0
         for i, card in enumerate(self.level.cards):
             self.card_slots.append(CardSlotUi(
-                start_slot[0] + i * (slot_size + slot_offset), start_slot[1], slot_size))
-            self.cards_ui.append(
-                CardUi(card, start_card[0] + i * (card_size + card_offset), start_card[1], card_size))
+                start_slot[0] + (i - nb_separator * resetCount) * (slot_size + slot_offset), start_slot[1] + ((slot_offset + slot_size) * resetCount), slot_size))
+            if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
+                resetCount += 1
 
         self.totalHeight = self.card_slots[-1].rect.bottom
+
+        resetCount = 0
+        for i, card in enumerate(self.level.cards):
+            self.cards_ui.append(
+                CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((slot_offset + slot_size) * resetCount) + self.totalHeight + 50, card_size))
+            if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
+                resetCount += 1
 
     def getAnswer(self) -> float | None:
         solutions: list[Card] = []
