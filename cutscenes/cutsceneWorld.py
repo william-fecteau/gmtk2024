@@ -1,12 +1,15 @@
 import pygame
-from constants import BLACK, GREEN_COLOR, LIGHT_BLACK, TARGET_FPS
+from constants import BLACK, GREEN_COLOR, LIGHT_BLACK, TARGET_CUTSCENE_FPS
 from cutscenes.cutscene import Cutscene
 
 class CutsceneWorld(Cutscene):
     def __init__(self, manager, currentWorldNumber : int):
         super().__init__(manager, currentWorldNumber)
         self.InitTitles(currentWorldNumber)
-        self.startTime = pygame.time.get_ticks()
+        self.animationStartStep = 1.2 * TARGET_CUTSCENE_FPS
+        self.animationEndStep = 5 * TARGET_CUTSCENE_FPS
+        self.animationSteps = self.animationEndStep - self.animationStartStep
+        self.cutsceneEndStep = 7 * TARGET_CUTSCENE_FPS
         self.currentStep = 0
 
     def InitTitles(self, worldNumber : int):
@@ -19,9 +22,6 @@ class CutsceneWorld(Cutscene):
         self.nextWorldTitle = "World " + str(self.nextWorldNumber)
         self.nextWorldSubTitle = str(nextWorldBits) + "-bit Integer"
 
-    def SetStep(self, step : int):
-        self.currentStep = step
-
     def GetPreviousCutscene(self) -> Cutscene:
         return Cutscene(self.manager, 0) # Must override in children
 
@@ -29,10 +29,11 @@ class CutsceneWorld(Cutscene):
         self.DrawNextWorld(screen)
         self.DrawCurrentWorld(screen)
         self.DrawPreviousWorld(screen)
-        self.currentStep += 1
+        self.UpdateTimers()
 
-        seconds = (pygame.time.get_ticks() - self.startTime) / 1000
-        self.completed = seconds > 6
+    def UpdateTimers(self):
+        self.currentStep += 1
+        self.completed = self.currentStep > self.cutsceneEndStep
 
     def DrawNextWorld(self, screen : pygame.Surface):
         screenCopy = screen.copy()
@@ -50,7 +51,7 @@ class CutsceneWorld(Cutscene):
         subTitlePos = [subTitlePosX, subTitlePosY + (mainTitle.get_height() / 2) + 10]
         screenCopy.blit(subTitle, subTitlePos)
 
-        scalePercent = max(1, (2 / max(1, self.currentStep / TARGET_FPS / 2)))
+        scalePercent = self.GetScalePercent(2, 1)
         scaledSize = [screen.get_width() * scalePercent, screen.get_height() * scalePercent]
         scaledCutScene = pygame.transform.scale(screenCopy, scaledSize)
         screen.blit(scaledCutScene, (0, self.manager.screenSize[1] - scaledCutScene.get_height()))
@@ -71,7 +72,7 @@ class CutsceneWorld(Cutscene):
         subTitlePos = [subTitlePosX, subTitlePosY + (mainTitle.get_height() / 2) + 10]
         screenCopy.blit(subTitle, subTitlePos)
 
-        scalePercent = max(0.5, (1 / max(1, self.currentStep / TARGET_FPS / 2)))
+        scalePercent = self.GetScalePercent(1, 0.5)
         scaledSize = [screen.get_width() * scalePercent, screen.get_height() * scalePercent]
         scaledCutScene = pygame.transform.scale(screenCopy, scaledSize)
         screen.blit(scaledCutScene, (0, self.manager.screenSize[1] - scaledCutScene.get_height()))
@@ -81,7 +82,17 @@ class CutsceneWorld(Cutscene):
         previousCutscene = self.GetPreviousCutscene()
         previousCutscene.Draw(prevScreenCopy)
 
-        scalePercent = max(0.5, (1 / max(1, self.currentStep / TARGET_FPS / 2))) / 2
+        scalePercent = self.GetScalePercent(0.5, 0.25)
         scaledSize = [screen.get_width() * scalePercent, screen.get_height() * scalePercent]
         scaledPrevCutscene = pygame.transform.scale(prevScreenCopy, scaledSize)
         screen.blit(scaledPrevCutscene, (0, self.manager.screenSize[1] - scaledPrevCutscene.get_height()))
+
+    def GetScalePercent(self, initialScale : float, minScale : float):
+        if (self.currentStep < self.animationStartStep):
+            return initialScale
+        elif (self.currentStep > self.animationEndStep):
+            return minScale
+
+        currentAnimationStep = self.currentStep - self.animationStartStep
+        progress = currentAnimationStep / self.animationSteps
+        return (minScale - initialScale) * progress + initialScale

@@ -1,4 +1,4 @@
-from constants import GREEN_COLOR, LIGHT_BLACK
+from constants import GREEN_COLOR, LIGHT_BLACK, TARGET_CUTSCENE_FPS
 from cutscenes.cutsceneWorld import CutsceneWorld
 import pygame
 
@@ -20,5 +20,5 @@ class CutsceneWorld0(CutsceneWorld):
         subTitlePos = [subTitlePosX, subTitlePosY + (title.get_height() / 2) + 10]
         screen.blit(subTitle, subTitlePos)
 
-        seconds = (pygame.time.get_ticks() - self.startTime) / 1000
-        self.completed = seconds > 3
+        self.currentStep += 1
+        self.completed = self.currentStep > 3 * TARGET_CUTSCENE_FPS

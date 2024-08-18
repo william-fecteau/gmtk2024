@@ -1,7 +1,7 @@
 from cutscenes.cutsceneWorld0 import CutsceneWorld0
 from cutscenes.cutsceneWorld1 import CutsceneWorld1
 from cutscenes.cutsceneWorldOther import CutsceneWorldOther
-from constants import TARGET_FPS
+from constants import TARGET_CUTSCENE_FPS
 from utils import resource_path
 import pygame
 import sys
@@ -37,4 +37,4 @@ class CutsceneManager():
             cutscene.Draw(screen)
 
             pygame.display.flip()
-            self.clock.tick(TARGET_FPS)
+            self.clock.tick(TARGET_CUTSCENE_FPS)
