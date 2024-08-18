@@ -3,7 +3,7 @@ import numpy as np
 import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
-from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE, WORLD_COLOR
+from constants import BLACK, DARK_GRAY, GREEN_COLOR, LIGHTER_GRAY, SCREEN_SIZE, WORLD_COLOR
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
@@ -17,7 +17,7 @@ class HelpUi:
         width *= 0.8
         height *= 0.2
         self.surf = pygame.Surface((width, height))
-        self.surf.fill(LIGHT_GRAY)
+        self.surf.fill(LIGHTER_GRAY)
         self.surf.set_alpha(253)
 
         font_smoll = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
