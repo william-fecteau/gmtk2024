@@ -17,7 +17,7 @@ class SandSimulator:
         self.bucket_on = True
 
 
-        self.pensize = 3
+        self.pensize = 1
 
         self.is_init = False
 
