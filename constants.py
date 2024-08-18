@@ -19,7 +19,7 @@ WORLD_COLOR = {
     "WORLD_1_COLOR" : (50, 199, 184),
     "WORLD_2_COLOR" : (200,80,230),
     "WORLD_3_COLOR" : (207, 35, 138),
-    "WORLD_4_COLOR" : (48, 194, 172),
+    "WORLD_4_COLOR" : (230, 18, 47),
     "WORLD_5_COLOR" : (95, 131, 222)
 }
 
