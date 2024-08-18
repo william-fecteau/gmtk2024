@@ -1,11 +1,12 @@
 import json
+from copy import deepcopy
 from dataclasses import dataclass
 
 import sympy
 from sympy import sympify
 
-VALID_CARD_VALUES = ['+', '-', '*', '/', '!', '(', ')', '^', 'exp', 'log',
-                     'ln', 'sqrt', 'pi', 'abs', 'e', 'sin', 'cos', 'tan']
+# VALID_CARD_VALUES = ['+', '-', '*', '/', '!', '(', ')', '^', 'exp', 'log',
+#                      'ln', 'sqrt', 'pi', 'e', 'sin', 'cos', 'tan']
 
 
 @dataclass
@@ -43,9 +44,16 @@ def load_level(level_path: str) -> Level:
             raise ValueError(f'Invalid nbBitsToOverflow for level {level_path}: {nb_bits_to_overflow}')
 
         raw_cards = level_json['cards']
-        for raw_card in raw_cards:
-            if not is_float(raw_card) and not raw_card in VALID_CARD_VALUES:
-                raise ValueError(f'Invalid card found for level {level_path}: {raw_card}')
+        # FUCK THIS VALIDATION IM TIRED
+        # for raw_card in raw_cards:
+        # valid = False
+        # for valid_card in VALID_CARD_VALUES:
+        #     if raw_card.startswith(valid_card):
+        #         valid = True
+        #         break
+
+        # if not is_float(raw_card):  # and not valid:
+        #     raise ValueError(f'Invalid card found for level {level_path}: {raw_card}')
 
         cards = [Card(raw_card) for raw_card in raw_cards]
 
@@ -103,21 +111,30 @@ def validate_solution(level: Level, solution: list[Card]) -> bool:
 
 
 def preprocess_solution(solution: list[Card]) -> list[Card]:
+    solution_copy = deepcopy(solution)
+
     # Sympy preprocess
-    for card in solution:
-        if card.value == 'e':
-            card.value = 'E'
+    for card in solution_copy:
+        card.value = card.value.replace('e', 'E').replace('Exp', 'exp')
 
     # For cards that are functions, assume next card is the argument LGTM for now
     # e.g. 'sqrt' -> 'sqrt(' + next_card + ')'
     processed_solution = []
     i = 0
-    while i < len(solution):
-        card = solution[i]
+    while i < len(solution_copy):
+        card = solution_copy[i]
 
-        if i >= len(solution) - 1:
+        if i >= len(solution_copy) - 1:
             processed_solution.append(card)
             i += 1
+            continue
+
+        next_card = solution_copy[i + 1]
+
+        if next_card.value == '(':
+            processed_solution.append(card)
+            processed_solution.append(next_card)
+            i += 2
             continue
 
         if card.value == 'sqrt':
@@ -140,8 +157,6 @@ def preprocess_solution(solution: list[Card]) -> list[Card]:
             processed_solution.append(card)
             i += 1
             continue
-
-        next_card = solution[i + 1]
 
         processed_solution.append(card)
         processed_solution.append(next_card)
@@ -173,9 +188,7 @@ def evaluate_solution(level: Level, solution: list[Card]) -> float:
 
 
 if __name__ == '__main__':
-    level_to_load = input('Enter the level to load: ')
-
-    level = load_level(f'res/levels/{level_to_load}.json')
+    level = load_level(f'res/worlds/1/7.json')
 
     cards_str = ', '.join([card.value for card in level.cards])
 
