@@ -156,7 +156,7 @@ class CardUi:
             self.rect.topleft = (int(newX), int(newY))
         except:
             self.rect.topleft = self.initPos
-            
+
         if (self.rect.topleft == self.initPos):
             self.needUpdate = False
 
@@ -173,7 +173,6 @@ class SandUi:
 
 
 class InGameState(State):
-
     def __init__(self, game):
         super().__init__(game)
         self.background = pygame.image.load(resource_path('./res/MenuImg/LevelBackground.png')).convert_alpha()
@@ -181,97 +180,149 @@ class InGameState(State):
         self.card_pickup = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Pickup.mp3'))
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
 
+    # ==============================================================================================================
+    # Update
+    # ==============================================================================================================
     def update(self) -> None:
-        mouse_pos = pygame.mouse.get_pos()
+        # Event handling
         self.last_mouse_move = pygame.mouse.get_rel()
         for event in self.game.events:
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.game.switchState("MenuState")
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Card selection
-                if self.selected_card is None:
-                    for card_ui in self.cards_ui:
-                        if card_ui.rect.collidepoint(mouse_pos):
-                            self.selected_card = card_ui
-                            pygame.mixer.Sound.play(self.card_pickup)
-                            # self.selected_card.saveInitialPos(card_ui.rect.topleft)
-                            self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
-                            break
-
-                # Help UI
-                if self.help_btn_rect.collidepoint(mouse_pos):
-                    if self.help_ui.is_open:
-                        self.help_ui.close()
-                    else:
-                        self.help_ui.open()
-                elif self.help_ui.is_open and not self.help_ui.help_surf_rect.collidepoint(mouse_pos):
-                    self.help_ui.close()
-                elif self.help_ui.close_rect.collidepoint(mouse_pos):
-                    self.help_ui.close()
-
+                self.handle_mouse_down()
             if event.type == pygame.MOUSEBUTTONUP:
-                if self.selected_card != None:
-                    pygame.mixer.Sound.play(self.card_drop)
-                    self.dontMove = False
-                    for slot in self.card_slots:
-                        if slot.cardInside(self.selected_card):
-                            self.dontMove = True
-                            if slot.card != None and slot.cardUI != None:
-                                slot.cardUI.setComebackPosition()
-                                self.selected_card.rect.center = slot.rect.center
-                                slot.card = self.selected_card.card
-                                slot.cardUI = self.selected_card
-                            if slot.card == None and slot.cardUI == None:
-                                self.selected_card.rect.center = slot.rect.center
+                self.handle_mouse_up()
 
-                                slot.card = self.selected_card.card
-                                slot.cardUI = self.selected_card
-
-                    if self.dontMove == False:
-                        self.selected_card.setComebackPosition()
-                    self.selected_card = None
-                for slot in self.card_slots:
-                    for card_ui in self.cards_ui:
-                        if slot.cardInside(card_ui):
-                            slot.setColor(GREEN_COLOR)
-                            if slot.card == None and slot.cardUI == None:
-                                card_ui.rect.center = slot.rect.center
-
-                                slot.card = card_ui.card
-                                slot.cardUI = card_ui
-                            break
-                        else:
-                            slot.setColor(DARK_GRAY)
-                            slot.card = None
-                            slot.cardUI = None
-                self.current_answer = self.getAnswer()
-
+        # Card dragging
+        mouse_pos = pygame.mouse.get_pos()
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore
 
+        # Card snap to initial position
         for card in self.cards_ui:
             if card.needUpdate == True:
                 card.moveToInitPost()
+
         # If overflow, switch to next level
-
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
-            pygame.mixer.Sound.play(self.level_clear)
-            max_worlds = get_max_worlds()
-            max_levels = get_max_levels_per_world(self.current_world)
+            self.level_completed()
 
-            next_world = self.current_world
-            next_level = self.current_level + 1
+    def handle_mouse_down(self):
+        mouse_pos = pygame.mouse.get_pos()
 
-            if next_level > max_levels:
-                next_world += 1
-                next_level = 1
+        # Card selection
+        if self.selected_card is None:
+            for card_ui in self.cards_ui:
+                if card_ui.rect.collidepoint(mouse_pos):
+                    self.selected_card = card_ui
+                    pygame.mixer.Sound.play(self.card_pickup)
+                    # self.selected_card.saveInitialPos(card_ui.rect.topleft)
+                    self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
+                    break
 
-            if next_world >= max_worlds:
-                self.game.switchState("CreditsState")
+        # Help UI
+        if self.help_btn_rect.collidepoint(mouse_pos):
+            if self.help_ui.is_open:
+                self.help_ui.close()
+            else:
+                self.help_ui.open()
+        elif self.help_ui.is_open and not self.help_ui.help_surf_rect.collidepoint(mouse_pos):
+            self.help_ui.close()
+        elif self.help_ui.close_rect.collidepoint(mouse_pos):
+            self.help_ui.close()
 
-            self.game.switchState("InGameState", InGameStatePayload(
-                next_world, next_level))
+    def handle_mouse_up(self):
+        if self.selected_card != None:
+            pygame.mixer.Sound.play(self.card_drop)
+            self.dontMove = False
+            for slot in self.card_slots:
+                if slot.cardInside(self.selected_card):
+                    self.dontMove = True
+                    if slot.card != None and slot.cardUI != None:
+                        slot.cardUI.setComebackPosition()
+                        self.selected_card.rect.center = slot.rect.center
+                        slot.card = self.selected_card.card
+                        slot.cardUI = self.selected_card
+                    if slot.card == None and slot.cardUI == None:
+                        self.selected_card.rect.center = slot.rect.center
+
+                        slot.card = self.selected_card.card
+                        slot.cardUI = self.selected_card
+
+            if self.dontMove == False:
+                self.selected_card.setComebackPosition()
+            self.selected_card = None
+        for slot in self.card_slots:
+            for card_ui in self.cards_ui:
+                if slot.cardInside(card_ui):
+                    slot.setColor(GREEN_COLOR)
+                    if slot.card == None and slot.cardUI == None:
+                        card_ui.rect.center = slot.rect.center
+
+                        slot.card = card_ui.card
+                        slot.cardUI = card_ui
+                    break
+                else:
+                    slot.setColor(DARK_GRAY)
+                    slot.card = None
+                    slot.cardUI = None
+
+        self.current_answer = self.getAnswer()
+
+    def level_completed(self):
+        pygame.mixer.Sound.play(self.level_clear)
+        max_worlds = get_max_worlds()
+        max_levels = get_max_levels_per_world(self.current_world)
+
+        next_world = self.current_world
+        next_level = self.current_level + 1
+
+        if next_level > max_levels:
+            next_world += 1
+            next_level = 1
+
+        if next_world >= max_worlds:
+            self.game.switchState("CreditsState")
+
+        self.game.switchState("InGameState", InGameStatePayload(next_world, next_level))
+
+    def getAnswer(self) -> float | None:
+        solutions: list[Card] = []
+        for slot in self.card_slots:
+            if slot.card is not None:
+                solutions.append(slot.card)
+
+        try:
+            value = evaluate_solution(self.level, solutions)  # type: ignore
+        except Exception as e:
+            return None
+
+        return value
+
+    # ==============================================================================================================
+    # Drawing
+    # ==============================================================================================================
+    def draw(self, screen) -> None:
+        screen.blit(self.background, pygame.Rect(0, 0, 1280, 720))
+
+        if (self.current_answer is not None):
+            overflow_ammount = self.current_answer * 100 / (2 ** self.level.nb_bits_to_overflow)
+        else:
+            overflow_ammount = 0.0
+        self.sand_ui.draw(overflow_ammount, screen)
+
+        self.sand_ui.update()
+        for card_slot in self.card_slots:
+            card_slot.draw(screen)
+
+        for card in self.cards_ui:
+            card.draw(screen)
+
+        self.draw_total(screen)
+
+        self.draw_help_ui(screen)
 
     def draw_total(self, screen: pygame.Surface) -> None:
         parsed_answer = "???"
@@ -299,25 +350,29 @@ class InGameState(State):
 
         self.help_ui.draw(screen)
 
-    def draw(self, screen) -> None:
-        screen.blit(self.background, pygame.Rect(0, 0, 1280, 720))
+    # ==============================================================================================================
+    # State management
+    # ==============================================================================================================
+    def onEnterState(self, payload: InGameStatePayload) -> None:
+        pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
+        pathLevel = os.path.join(pathStr)
 
-        if (self.current_answer is not None):
-            overflow_ammount = self.current_answer * 100 / (2 ** self.level.nb_bits_to_overflow)
-        else:
-            overflow_ammount = 0.0
-        self.sand_ui.draw(overflow_ammount, screen)
+        self.current_world = payload.world
+        self.current_level = payload.level
+        self.level = load_level(pathLevel)
 
-        self.sand_ui.update()
-        for card_slot in self.card_slots:
-            card_slot.draw(screen)
+        self.current_answer: float | None = None
+        self.selected_card: CardUi | None = None
+        self.mouse_click_offset = (0, 0)
 
-        for card in self.cards_ui:
-            card.draw(screen)
+        self.init_card_slots()
 
-        self.draw_total(screen)
+        self.help_ui = HelpUi(self.level.hint)
 
-        self.draw_help_ui(screen)
+        self.sand_ui = SandUi()
+
+    def onExitState(self) -> None:
+        pass
 
     def init_card_slots(self):
         self.card_slots: list[CardSlotUi] = []
@@ -374,37 +429,3 @@ class InGameState(State):
                 CardUi(card, start_card[0] + (i - nb_separator * resetCount) * (card_size + card_offset), ((card_offset + card_size) * resetCount) + self.card_slots[-1].rect.bottom + 20, card_size))
             if nb_separator and np.mod(i, nb_separator) == nb_separator - 1:
                 resetCount += 1
-
-    def getAnswer(self) -> float | None:
-        solutions: list[Card] = []
-        for slot in self.card_slots:
-            if slot.card is not None:
-                solutions.append(slot.card)
-
-        try:
-            value = evaluate_solution(self.level, solutions)  # type: ignore
-        except Exception as e:
-            return None
-
-        return value
-
-    def onEnterState(self, payload: InGameStatePayload) -> None:
-        pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
-        pathLevel = os.path.join(pathStr)
-
-        self.current_world = payload.world
-        self.current_level = payload.level
-        self.level = load_level(pathLevel)
-
-        self.current_answer: float | None = None
-        self.selected_card: CardUi | None = None
-        self.mouse_click_offset = (0, 0)
-
-        self.init_card_slots()
-
-        self.help_ui = HelpUi(self.level.hint)
-
-        self.sand_ui = SandUi()
-
-    def onExitState(self) -> None:
-        pass
