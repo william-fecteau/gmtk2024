@@ -444,12 +444,11 @@ class InGameState(State):
     def draw_next(self, screen: pygame.Surface) -> None:
 
         surf = pygame.Surface((150, 80))
-        buttonImage = pygame.image.load(resource_path('./res/carteV2.png')).convert_alpha()
-        # surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
-        surf.fill((147, 147, 147))
+        buttonImage = pygame.image.load(resource_path('./res/NextLevelButton.png'))
+        surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
 
         next_button_text = pygame.font.Font(resource_path(
-            './res/TTOctosquaresTrialRegular.ttf'), 48).render("Next", True, (0, 0, 0))
+            './res/TTOctosquaresTrialRegular.ttf'), 42).render("Next", True, (0, 0, 0))
         text_rect = next_button_text.get_rect(center=surf.get_rect().center)
         surf.blit(next_button_text, text_rect)
         screen.blit(surf, self.next_button_rect)
