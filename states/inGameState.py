@@ -77,6 +77,7 @@ class CardUi:
         self.surf.blit(text_surf, text_rect)
 
         self.rect = pygame.Rect(x, y, size, size)
+        self.initPos = self.rect.topleft
         self.needUpdate = False
 
     def get_card_display(self) -> str:
@@ -106,31 +107,49 @@ class CardUi:
 
     def setComebackPosition(self, pos: tuple[int, int]):
         self.needUpdate = True
-
     def moveToInitPost(self):
+        distance = 10
+        distanceX = abs(self.rect.topleft[0] - self.initPos[0])
+        distanceY = abs(self.rect.topleft[1] - self.initPos[1])
+
+        if(distanceX == 0):
+            ratioDistanceY = distanceY/1
+            parcoursY = distance*ratioDistanceY
+        else:
+            ratioDistanceY = distanceY/distanceX
+            parcoursY = distance*ratioDistanceY
+        if(distanceY == 0):
+            ratioDistanceX = distanceX/1
+            parcoursX = distance*ratioDistanceX
+        else:
+            ratioDistanceX = distanceX/distanceY
+            parcoursX = distance*ratioDistanceX
+
         newX = self.rect.topleft[0]
         newY = self.rect.topleft[1]
-        if (abs(self.rect.topleft[0] - self.initPos[0]) < 10):
-            if (self.rect.topleft[0] > self.initPos[0]):
+        if(abs(self.rect.topleft[0] - self.initPos[0]) < parcoursX):
+            if(self.rect.topleft[0] > self.initPos[0]):
                 newX = self.rect.topleft[0] - (self.rect.topleft[0] - self.initPos[0])
             if (self.rect.topleft[0] < self.initPos[0]):
                 newX = self.rect.topleft[0] + (self.rect.topleft[0] - self.initPos[0])
 
-        if (abs(self.rect.topleft[1] - self.initPos[1]) < 10):
-            if (self.rect.topleft[1] > self.initPos[1]):
+        if(abs(self.rect.topleft[1] - self.initPos[1]) < parcoursY):
+            if(self.rect.topleft[1] > self.initPos[1]):
                 newY = self.rect.topleft[1] - (self.rect.topleft[1] - self.initPos[1])
             if (self.rect.topleft[1] < self.initPos[1]):
                 newY = self.rect.topleft[1] + (self.rect.topleft[1] - self.initPos[1])
 
-        if (newX > self.initPos[0]):
-            newX = self.rect.topleft[0] - 10
-        if (newY > self.initPos[1]):
-            newY = self.rect.topright[1] - 10
-        if (newX < self.initPos[0]):
-            newX = self.rect.topleft[0] + 10
-        if (newY < self.initPos[1]):
-            newY = self.rect.topleft[1] + 10
-        self.rect.topleft = (newX, newY)
+        
+        if(newX > self.initPos[0]):
+            newX = self.rect.topleft[0] - parcoursX
+        if(newY > self.initPos[1]):
+            newY = self.rect.topright[1] - parcoursY
+        if(newX < self.initPos[0]):
+            newX = self.rect.topleft[0] + parcoursX
+        if(newY < self.initPos[1]):
+            newY = self.rect.topleft[1] + parcoursY
+
+        self.rect.topleft = (int(newX), int(newY))
 
         if (self.rect.topleft == self.initPos):
             self.needUpdate = False
@@ -153,7 +172,7 @@ class InGameState(State):
                     for card_ui in self.cards_ui:
                         if card_ui.rect.collidepoint(mouse_pos):
                             self.selected_card = card_ui
-                            self.selected_card.saveInitialPos(card_ui.rect.topleft)
+                            #self.selected_card.saveInitialPos(card_ui.rect.topleft)
                             self.mouse_click_offset = np.array(mouse_pos) - np.array(card_ui.rect.topleft)
                             break
 
@@ -181,6 +200,7 @@ class InGameState(State):
                     for card_ui in self.cards_ui:
                         if slot.cardInside(card_ui):
                             slot.setColor(GREEN_COLOR)
+                            card_ui.rect.center = slot.rect.center
                             slot.card = card_ui.card
                             break
                         else:
@@ -191,8 +211,12 @@ class InGameState(State):
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore
-
+        
+        for card in self.cards_ui:
+            if card.needUpdate == True:
+                card.moveToInitPost()
         # If overflow, switch to next level
+        
         if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
             max_worlds = get_max_worlds()
             max_levels = get_max_levels_per_world(self.current_world)
