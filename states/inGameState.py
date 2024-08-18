@@ -168,6 +168,7 @@ class InGameState(State):
 
     def __init__(self, game):
         super().__init__(game)
+        self.background = pygame.image.load(resource_path('./res/MenuImg/LevelBackground.png')).convert_alpha()
         self.card_drop = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Drop.mp3'))
         self.card_pickup = pygame.mixer.Sound(resource_path('./res/Sfx_Card_Pickup.mp3'))
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
@@ -279,6 +280,7 @@ class InGameState(State):
 
         screen.blit(self.goal_text, self.goal_rect)
         screen.blit(self.desc_goal, self.desc_rect)
+        screen.blit(self.world_text, self.world_rect)
 
     def draw_help_ui(self, screen: pygame.Surface) -> None:
         help_surface = pygame.font.Font(resource_path(
@@ -289,6 +291,8 @@ class InGameState(State):
         self.help_ui.draw(screen)
 
     def draw(self, screen) -> None:
+        screen.blit(self.background, pygame.Rect(0, 0, 1280, 720))
+
         if (self.current_answer is not None):
             overflow_ammount = self.current_answer * 100 / (2 ** self.level.nb_bits_to_overflow)
         else: overflow_ammount = 0.0
@@ -313,12 +317,18 @@ class InGameState(State):
         self.goal_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
-        self.goal_rect.y = -20#1/18 * self.game.screen.get_rect().h
+        self.goal_rect.y = -20
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           40).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
         self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
-        self.desc_rect.y = 110#7/32 * self.game.screen.get_rect().h
+        self.desc_rect.y = 110
+
+        self.world_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
+                                          32).render('World ' + str(self.current_world) + ' Level '+ str(self.current_level), True, (255, 255, 255))
+        self.world_rect = self.world_text.get_rect(bottomright=self.game.screen.get_rect().bottomright)
+        self.world_rect.x -= 15
+        self.world_rect.y -= 10
 
         slot_size = 100
         slot_offset = 20
