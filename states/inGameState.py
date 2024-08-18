@@ -1,4 +1,3 @@
-from sand_simulathor.sand_simulator import SandSimulator
 import os
 
 import numpy as np
@@ -7,6 +6,7 @@ import sympy.core.numbers as spnumbers
 
 from constants import DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE
 from levels import Card, evaluate_solution, load_level
+from sand_simulathor.sand_simulator import SandSimulator
 from states.payloads import InGameStatePayload
 from utils import get_max_levels_per_world, get_max_worlds, resource_path
 
@@ -273,9 +273,8 @@ class InGameState(State):
 
         self.total_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                            80).render(parsed_answer, True, (255, 255, 255))
-        self.total_rect = self.total_text.get_rect()
-        self.total_rect.x = int(1280 * 3 / 4)
-        self.total_rect.y = self.goal_rect.y + 30
+        self.total_rect = self.total_text.get_rect(center=self.game.screen.get_rect().center)
+        self.total_rect.y = int(1280 / 8)
         screen.blit(self.total_text, self.total_rect)
 
         screen.blit(self.goal_text, self.goal_rect)
@@ -314,12 +313,12 @@ class InGameState(State):
         self.goal_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                           128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
-        self.goal_rect.y = 1/18 * self.game.screen.get_rect().h
+        self.goal_rect.y = -20#1/18 * self.game.screen.get_rect().h
 
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                          64).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
+                                          40).render(str(self.level.nb_bits_to_overflow) + '-bit Integer', True, (255, 255, 255))
         self.desc_rect = self.desc_goal.get_rect(center=self.game.screen.get_rect().center)
-        self.desc_rect.y = 7/32 * self.game.screen.get_rect().h
+        self.desc_rect.y = 110#7/32 * self.game.screen.get_rect().h
 
         slot_size = 100
         slot_offset = 20
