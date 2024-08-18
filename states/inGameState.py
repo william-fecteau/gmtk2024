@@ -49,6 +49,7 @@ class CardSlotUi:
         self.surf = pygame.Surface((size, size))
         self.surf.fill(DARK_GRAY)
         self.card: Card | None = None
+        self.cardUI: CardUi | None = None
 
         self.rect = pygame.Rect(x, y, size, size)
 
@@ -102,11 +103,9 @@ class CardUi:
     def draw(self, surface: pygame.Surface):
         surface.blit(self.surf, self.rect.topleft)
 
-    def saveInitialPos(self, pos: tuple[int, int]) -> None:
-        self.initPos = pos
-
-    def setComebackPosition(self, pos: tuple[int, int]):
+    def setComebackPosition(self):
         self.needUpdate = True
+
     def moveToInitPost(self):
         distance = 10
         distanceX = abs(self.rect.topleft[0] - self.initPos[0])
@@ -192,20 +191,34 @@ class InGameState(State):
                     for slot in self.card_slots:
                         if slot.cardInside(self.selected_card):
                             self.dontMove = True
+                            if slot.card != None and slot.cardUI != None:
+                                slot.cardUI.setComebackPosition()
+                                self.selected_card.rect.center = slot.rect.center
+                                slot.card = self.selected_card.card
+                                slot.cardUI = self.selected_card
+                            if slot.card == None and slot.cardUI == None:
+                                self.selected_card.rect.center = slot.rect.center
+
+                                slot.card = self.selected_card.card
+                                slot.cardUI = self.selected_card
 
                     if self.dontMove == False:
-                        self.selected_card.setComebackPosition(self.selected_card.initPos)
+                        self.selected_card.setComebackPosition()
                     self.selected_card = None
                 for slot in self.card_slots:
                     for card_ui in self.cards_ui:
                         if slot.cardInside(card_ui):
                             slot.setColor(GREEN_COLOR)
-                            card_ui.rect.center = slot.rect.center
-                            slot.card = card_ui.card
+                            if slot.card == None and slot.cardUI == None:
+                                card_ui.rect.center = slot.rect.center
+
+                                slot.card = card_ui.card
+                                slot.cardUI = card_ui
                             break
                         else:
                             slot.setColor(DARK_GRAY)
                             slot.card = None
+                            slot.cardUI = None
                 self.current_answer = self.getAnswer()
 
         if self.selected_card is not None:
