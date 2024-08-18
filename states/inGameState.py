@@ -284,7 +284,7 @@ class InGameState(State):
             for slot in self.card_slots:
                 if slot.cardInside(self.selected_card):
                     self.dontMove = True
-                    if slot.card != None and slot.cardUI != None:
+                    if slot.card != None and slot.cardUI != None and slot.cardUI != self.selected_card:
                         slot.cardUI.setComebackPosition()
                         self.selected_card.rect.center = slot.rect.center
                         slot.card = self.selected_card.card
