@@ -105,35 +105,50 @@ class CardUi:
         self.initPos = pos
 
     def setComebackPosition(self, pos: tuple[int, int]):
-        # self.rect.topleft = pos
         self.needUpdate = True
-        print(self.rect.topleft[0])
-    # I'm sorry
-
     def moveToInitPost(self):
+        distance = 10
+        distanceX = abs(self.rect.topleft[0] - self.initPos[0])
+        distanceY = abs(self.rect.topleft[1] - self.initPos[1])
+
+        if(distanceX == 0):
+            ratioDistanceY = distanceY/1
+            parcoursY = distance*ratioDistanceY
+        else:
+            ratioDistanceY = distanceY/distanceX
+            parcoursY = distance*ratioDistanceY
+        if(distanceY == 0):
+            ratioDistanceX = distanceX/1
+            parcoursX = distance*ratioDistanceX
+        else:
+            ratioDistanceX = distanceX/distanceY
+            parcoursX = distance*ratioDistanceX
+
         newX = self.rect.topleft[0]
         newY = self.rect.topleft[1]
-        if (abs(self.rect.topleft[0] - self.initPos[0]) < 10):
-            if (self.rect.topleft[0] > self.initPos[0]):
+        if(abs(self.rect.topleft[0] - self.initPos[0]) < parcoursX):
+            if(self.rect.topleft[0] > self.initPos[0]):
                 newX = self.rect.topleft[0] - (self.rect.topleft[0] - self.initPos[0])
             if (self.rect.topleft[0] < self.initPos[0]):
                 newX = self.rect.topleft[0] + (self.rect.topleft[0] - self.initPos[0])
 
-        if (abs(self.rect.topleft[1] - self.initPos[1]) < 10):
-            if (self.rect.topleft[1] > self.initPos[1]):
+        if(abs(self.rect.topleft[1] - self.initPos[1]) < parcoursY):
+            if(self.rect.topleft[1] > self.initPos[1]):
                 newY = self.rect.topleft[1] - (self.rect.topleft[1] - self.initPos[1])
             if (self.rect.topleft[1] < self.initPos[1]):
                 newY = self.rect.topleft[1] + (self.rect.topleft[1] - self.initPos[1])
 
-        if (newX > self.initPos[0]):
-            newX = self.rect.topleft[0] - 10
-        if (newY > self.initPos[1]):
-            newY = self.rect.topright[1] - 10
-        if (newX < self.initPos[0]):
-            newX = self.rect.topleft[0] + 10
-        if (newY < self.initPos[1]):
-            newY = self.rect.topleft[1] + 10
-        self.rect.topleft = (newX, newY)
+        
+        if(newX > self.initPos[0]):
+            newX = self.rect.topleft[0] - parcoursX
+        if(newY > self.initPos[1]):
+            newY = self.rect.topright[1] - parcoursY
+        if(newX < self.initPos[0]):
+            newX = self.rect.topleft[0] + parcoursX
+        if(newY < self.initPos[1]):
+            newY = self.rect.topleft[1] + parcoursY
+
+        self.rect.topleft = (int(newX), int(newY))
 
         if (self.rect.topleft == self.initPos):
             self.needUpdate = False
@@ -171,7 +186,6 @@ class InGameState(State):
                     self.help_ui.close()
 
             if event.type == pygame.MOUSEBUTTONUP:
-                # self.selected_card = None
                 if self.selected_card != None:
                     self.dontMove = False
                     for slot in self.card_slots:
@@ -195,6 +209,15 @@ class InGameState(State):
         if self.selected_card is not None:
             offset_pos = np.array(mouse_pos) - np.array(self.mouse_click_offset)
             self.selected_card.move(offset_pos)  # type: ignore
+        
+        for card in self.cards_ui:
+            if card.needUpdate == True:
+                card.moveToInitPost()
+        # If overflow, switch to next level
+        
+        if self.current_answer is not None and self.current_answer > (2 ** self.level.nb_bits_to_overflow) - 1:
+            self.game.switchState("InGameState", InGameStatePayload(
+                self.current_world, self.current_level+1))
 
     def draw_total(self, screen: pygame.Surface) -> None:
         parsed_answer = "???"
@@ -300,6 +323,9 @@ class InGameState(State):
     def onEnterState(self, payload: InGameStatePayload) -> None:
         pathStr = f"res/worlds/{payload.world}/{payload.level}.json"
         pathLevel = os.path.join(pathStr)
+
+        self.current_world = payload.world
+        self.current_level = payload.level
         self.level = load_level(pathLevel)
 
         self.current_answer: float | None = None
