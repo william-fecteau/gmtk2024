@@ -1,4 +1,3 @@
-from cutscenes.cutsceneManager import CutsceneManager
 from sand_simulathor.sand_simulator import SandSimulator
 import os
 
@@ -295,9 +294,6 @@ class InGameState(State):
             overflow_ammount = self.current_answer * 100 / (2 ** self.level.nb_bits_to_overflow)
         else: overflow_ammount = 0.0
         self.sand_ui.draw(overflow_ammount, screen)
-
-        test = CutsceneManager()
-        test.DisplayCustcene(screen, 1) # TODO RM
 
         self.sand_ui.update()
         for card_slot in self.card_slots:
