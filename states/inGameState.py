@@ -199,6 +199,7 @@ class InGameState(State):
                     for card_ui in self.cards_ui:
                         if slot.cardInside(card_ui):
                             slot.setColor(GREEN_COLOR)
+                            card_ui.rect.center = slot.rect.center
                             slot.card = card_ui.card
                             break
                         else:
