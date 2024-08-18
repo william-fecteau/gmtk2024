@@ -1,3 +1,4 @@
+from constants import PURPLE
 from .trashcan import Metal, Sand
 import random
 
@@ -47,10 +48,9 @@ class SandSimulator:
 
     def draw_particles(self, overflow_ammount, surface):
         for element in list(self.allelements.keys()):
-            beige = (255,0,255)
             x = self.allelements[element].x
             y = self.allelements[element].y
-            self.allelements[element].draw(x, y, beige)
+            self.allelements[element].draw(x, y, PURPLE)
             
         if not self.is_init:
             self.init_sand_bucket(surface)

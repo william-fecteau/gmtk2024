@@ -1,11 +1,10 @@
 import random
+from constants import PURPLE
 import pygame
 
 aircolor = (0,0,0)    
 scale = 10
 
-beige = (255,0,255)
-grey = (88, 110, 117)
 
 class Particle:
     def __init__(self,x,y,allelements,SURFACE):
@@ -24,7 +23,6 @@ class Particle:
         elif not 0 <= self.y <= 72:
             self.draw(x,y,aircolor)
             del self.allelements[(x,y)]
-            print("deleting part")
             return True
         return False
         
@@ -52,7 +50,7 @@ class Particle:
             self.draw(oldx,oldy,aircolor) #delete old pixel
             (self.x,self.y) = (newx,newy)
             self.allelements[(newx,newy)] = self
-            self.draw(newx,newy,beige)
+            self.draw(newx,newy,PURPLE)
             self.changed[(oldx,oldy)] = True
             self.changed[(newx,newy)] = True
             return True
@@ -60,7 +58,7 @@ class Particle:
         
 class Metal(Particle): #metal just sits there and doesnt move
     def __init__(self,x,y,allelements,SURFACE):
-        self.color = grey
+        self.color = PURPLE
         Particle.__init__(self,x,y,allelements,SURFACE) 
         self.draw(self.x, self.y,self.color) 
         
@@ -71,7 +69,7 @@ class Metal(Particle): #metal just sits there and doesnt move
     
 class Sand(Particle): #sand behaves like a very viscous liquid, BUT is CLASSED as a solid
     def __init__(self,x,y,allelements,SURFACE):
-        self.color = beige
+        self.color = PURPLE
         self.flowchance = 0.03 #chance to behave as liquid per tick (CAN CHANGE IF WET)
         Particle.__init__(self,x,y,allelements,SURFACE)
         self.draw(self.x, self.y,self.color) 
