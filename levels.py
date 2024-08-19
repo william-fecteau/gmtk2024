@@ -111,6 +111,10 @@ def validate_solution(level: Level, solution: list[Card]) -> bool:
         if a == '/' and b == '/':
             print(f'Two consecutive division found in solution: {solution[i].value}, {solution[i + 1].value}')
             return False
+        # This is to prevent multiplication becoming exposant
+        if a == '*' and b == '*':
+            print(f'Two consecutive division found in solution: {solution[i].value}, {solution[i + 1].value}')
+            return False
 
     return True
 

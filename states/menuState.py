@@ -13,7 +13,7 @@ class MenuState (State):
 
     def __init__(self, game):
         super().__init__(game)
-
+        self.title = "0verflow"
         width, height = SCREEN_SIZE
         self.surf = pygame.Surface(SCREEN_SIZE)
         self.backgroundSnake = pygame.image.load(resource_path('./res/MenuImg/MenuBackground.png'))
@@ -38,7 +38,7 @@ class MenuState (State):
         self.menu.draw(self.surf)
 
         self.surf.blit(self.bigSnakeFont.render(
-            "Overflow", True, WHITE), (150, 50))
+            self.title, True, WHITE), (150, 50))
         self.surf.blit(self.smolSnakeFont.render(
             "Number get big", True, WHITE), (150, 125))
         #self.surf.blit(self.smolSnakeFont.render("Centering text is hard",
@@ -48,15 +48,21 @@ class MenuState (State):
 
     def update(self) -> None:
         self.menu.update(self.game.events)
+        for event in self.game.events:
+            if event.type == pygame.KEYUP:
+                self.title = self.title[0:-1] + "ow"
 
     def menuAction(self) -> None:
+        self.title = "0verflow"
         self.game.switchState(
             "InGameState", InGameStatePayload(0, 1))
 
     def levelSelect(self) -> None:
+        self.title = "0verflow"
         self.game.switchState("LevelSelectState")
 
     def credits(self) -> None:
+        self.title = "0verflow"
         self.game.switchState("CreditsState")
 
     def setupMenu(self) -> None:

@@ -203,7 +203,7 @@ class InGameState(State):
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
         self.next_world_sfx = pygame.mixer.Sound(resource_path('./res/NextWorldSFX.mp3'))
         self.cutsceneManager = CutsceneManager()
-        
+
 
     # ==============================================================================================================
     # Update
@@ -444,8 +444,11 @@ class InGameState(State):
         self.help_ui.draw(screen)
 
     def draw_next(self, screen: pygame.Surface) -> None:
+        color = WORLD_COLORS.get(self.current_world, BLACK)
 
         surf = pygame.Surface((150, 80))
+
+        surf.fill(color)
         buttonImage = pygame.image.load(resource_path('./res/NextLevelButton.png'))
         surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
 
@@ -504,7 +507,7 @@ class InGameState(State):
 
         self.next_button_rect = pygame.Rect(self.game.screen.get_rect().right - 200,
                                             self.game.screen.get_rect().bottom - 150, 150, 80)
-        
+
         pygame.mixer.music.load(resource_path('./res/MainThemeV3.mp3'))
         pygame.mixer.music.set_volume(0.35)
         pygame.mixer.music.play(-1)
@@ -548,7 +551,7 @@ class InGameState(State):
 
 
 TUTORIAL_STEPS = [
-    "This is the target you need to overflow, which mean you need a bigger number than this",
+    "This is the target you need to overflow, which means you need a bigger number than this",
     "Those are the cards you can combine to overflow the target",
     "Drag or double-click the cards in these slots to make an equation",
     "The evaluated equation will show up here along with it's binary representation",

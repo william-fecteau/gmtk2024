@@ -14,6 +14,7 @@ class Game:
         pygame.init()
         pygame.font.init()
         pygame.display.set_caption("Overflow")
+        pygame.display.set_icon(pygame.image.load(utils.resource_path('./res/logo.ico')))
 
         self.screen = pygame.display.set_mode(SCREEN_SIZE, pygame.HWSURFACE | pygame.DOUBLEBUF)
         pygame.mixer.music.load(utils.resource_path('./res/TitleTheme.mp3'))

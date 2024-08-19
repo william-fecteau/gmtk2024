@@ -1,6 +1,9 @@
 import pygame
-from constants import BLACK, LIGHT_BLACK, TARGET_CUTSCENE_FPS, WHITE, WORLD_COLORS
+
+from constants import (BLACK, LIGHT_BLACK, TARGET_CUTSCENE_FPS, WHITE,
+                       WORLD_COLORS)
 from cutscenes.cutscene import Cutscene
+
 
 class CutsceneWorld(Cutscene):
     def __init__(self, manager, currentWorldNumber : int):
@@ -38,7 +41,7 @@ class CutsceneWorld(Cutscene):
     def DrawNextWorld(self, screen : pygame.Surface):
         screenCopy = screen.copy()
         screenCopy.fill(BLACK if (self.nextWorldNumber % 2 == 0) else LIGHT_BLACK)
-        textColor = WORLD_COLORS.get(self.nextWorldNumber, WHITE)
+        textColor = WORLD_COLORS.get(self.nextWorldNumber-1, WHITE)
 
         mainTitle : pygame.Surface = self.manager.largeFont.render(self.nextWorldTitle, True, textColor)
         mainTitlePosX = screenCopy.get_width() / 4 * 3 - (mainTitle.get_width() / 2)
@@ -60,7 +63,7 @@ class CutsceneWorld(Cutscene):
     def DrawCurrentWorld(self, screen : pygame.Surface):
         screenCopy = screen.copy()
         screenCopy.fill(BLACK if (self.worldNumber % 2 == 0) else LIGHT_BLACK)
-        textColor = WORLD_COLORS.get(self.worldNumber, WHITE)
+        textColor = WORLD_COLORS.get(self.worldNumber-1, WHITE)
 
         mainTitle : pygame.Surface = self.manager.largeFont.render(self.currentWorldTitle, True, textColor)
         mainTitlePosX = screenCopy.get_width() / 4 * 3 - (mainTitle.get_width() / 2)
