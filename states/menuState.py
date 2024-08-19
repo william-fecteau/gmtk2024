@@ -50,7 +50,7 @@ class MenuState (State):
         self.menu.update(self.game.events)
         for event in self.game.events:
             if event.type == pygame.KEYUP:
-                self.title = self.title[0:-1] + "oW" 
+                self.title = self.title[0:-1] + "ow" 
 
     def menuAction(self) -> None:
         self.title = "0verflow"
