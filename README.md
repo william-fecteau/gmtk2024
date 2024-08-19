@@ -8,8 +8,9 @@ This project was made in 48h during the GMTK 2024 game jam.
 ## How to play the game
 
 ### Built binaries
-Windows: 
-Linux: 
+[Windows](https://github.com/william-fecteau/gmtk2024/releases/download/1.0/overflow-windows.exe) 
+
+[Linux](https://github.com/william-fecteau/gmtk2024/releases/download/1.0/overflow-linux) 
 
 ### With python directly
 **Pre-requisite: Python 3.10**
