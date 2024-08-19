@@ -338,7 +338,7 @@ class InGameState(State):
         for slot in self.card_slots:
             if slot.card is not None:
                 solutions.append(slot.card)
-        
+
         try:
             value = evaluate_solution(self.level, solutions, self.current_world, self.game)  # type: ignore
         except Exception as e:
@@ -423,8 +423,9 @@ class InGameState(State):
 
         binary_str = binary_str.zfill(self.level.nb_bits_to_overflow)
 
+        descGoalFontSize = 12 if self.current_world == 4 else 40
         self.desc_goal = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                          40).render(binary_str, True, color)
+                                          descGoalFontSize).render(binary_str, True, color)
         self.desc_rect = self.desc_goal.get_rect(center=self.total_rect.center)
         self.desc_rect.move_ip(0, 50)
 
@@ -494,10 +495,11 @@ class InGameState(State):
         self.card_slots: list[CardSlotUi] = []
         self.cards_ui: list[CardUi] = []
 
+        goalFontSize = 40 if self.current_world == 4 else 128
         self.goal_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
-                                          128).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
+                                          goalFontSize).render(f'{(2 ** self.level.nb_bits_to_overflow) - 1:,}', True, (255, 255, 255))
         self.goal_rect = self.goal_text.get_rect(center=self.game.screen.get_rect().center)
-        self.goal_rect.y = -20  # 1/18 * self.game.screen.get_rect().h
+        self.goal_rect.y = 40 if self.current_world == 4 else -20  # 1/18 * self.game.screen.get_rect().h
 
         self.world_text = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'),
                                            32).render('World ' + str(self.current_world) + ' Level ' + str(self.current_level), True, (255, 255, 255))
