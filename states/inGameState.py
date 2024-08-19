@@ -4,8 +4,7 @@ import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
 
-from constants import (BLACK, DARK_GRAY, GREEN_COLOR, LIGHT_GRAY, SCREEN_SIZE,
-                       WORLD_COLORS)
+from constants import BLACK, DARK_GRAY, GREEN_COLOR, SCREEN_SIZE, WORLD_COLORS
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
@@ -21,8 +20,8 @@ class HelpUi:
         width *= 0.8
         height *= 0.2
         self.surf = pygame.Surface((width, height))
-        self.surf.fill(LIGHT_GRAY)
-        self.surf.set_alpha(253)
+        self.boxImage = pygame.image.load(resource_path('./res/HintTextbox.png')).convert_alpha()
+        self.surf.blit(self.boxImage, pygame.Rect(0, 0, 80, 80))
 
         font_smoll = pygame.font.Font(resource_path('./res/TTOctosquaresTrialRegular.ttf'), 24)
 
@@ -557,7 +556,7 @@ TUTORIAL_STEPS = [
     "Those are the cards you can combine to overflow the target",
     "Drag or double-click the cards in these slots to make an equation",
     "The evaluated equation will show up here along with it's binary representation",
-    "If you need help, click on the '?' button to get an hint. Good luck!"
+    '''The key "R" restes the board. If you need help, click on the '?' button to get an hint. Good luck!'''
 ]
 
 
