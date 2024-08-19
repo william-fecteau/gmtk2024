@@ -4,7 +4,7 @@ import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
 
-from constants import BLACK, DARK_GRAY, GREEN_COLOR, SCREEN_SIZE, WORLD_COLORS
+from constants import BLACK, DARK_GRAY, GREEN_COLOR, SCREEN_SIZE, TARGET_FPS, WORLD_COLORS
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
@@ -314,8 +314,11 @@ class InGameState(State):
     def level_completed(self) -> None:
         if (not self.completed):
             pygame.mixer.Sound.play(self.level_clear)
+            self.updateSand = False
 
         self.completed = true
+        self.stopSandTimer -= 1
+
     def go_next_level(self) -> None:
         max_worlds = get_max_worlds()
         max_levels = get_max_levels_per_world(self.current_world)
@@ -366,9 +369,12 @@ class InGameState(State):
             overflow_ammount = self.current_answer * 100 / (2 ** self.level.nb_bits_to_overflow)
         else:
             overflow_ammount = 0.0
+
+        if (self.updateSand or self.stopSandTimer > 0):
+            self.sand_ui.update()
+
         self.sand_ui.draw(overflow_ammount, screen)
 
-        self.sand_ui.update()
         for card_slot in self.card_slots:
             card_slot.draw(screen)
 
@@ -488,6 +494,8 @@ class InGameState(State):
         if (self.cutsceneManager.queuedCutscene != payload.world):
             self.cutsceneManager.QueueCutscene(payload.world)
 
+        self.updateSand = True
+        self.stopSandTimer = 10 * TARGET_FPS
         self.help_ui = HelpUi(self.level.hint)
         self.sand_ui = SandUi(self.current_world)
 
