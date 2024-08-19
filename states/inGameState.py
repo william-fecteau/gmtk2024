@@ -565,7 +565,7 @@ TUTORIAL_STEPS = [
     "Those are the cards you can combine to overflow the target",
     "Drag or double-click the cards in these slots to make an equation",
     "The evaluated equation will show up here along with it's binary representation",
-    '''The key "R" restes the board. If you need help, click on the '?' button to get an hint. Good luck!'''
+    '''The key "R" resets the board. If you need help, click on the '?' button to get an hint. Good luck!'''
 ]
 
 
