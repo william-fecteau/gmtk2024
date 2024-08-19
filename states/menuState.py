@@ -50,7 +50,7 @@ class MenuState (State):
         self.menu.update(self.game.events)
         for event in self.game.events:
             if event.type == pygame.KEYUP:
-                self.title = self.title[0:-1] + "ow" 
+                self.title = self.title[0:-1] + "ow"
 
     def menuAction(self) -> None:
         self.title = "0verflow"
@@ -58,11 +58,11 @@ class MenuState (State):
             "InGameState", InGameStatePayload(0, 1))
 
     def levelSelect(self) -> None:
-        self.title = "0verfl0w"
+        self.title = "0verflow"
         self.game.switchState("LevelSelectState")
 
     def credits(self) -> None:
-        self.title = "0verfl0w"
+        self.title = "0verflow"
         self.game.switchState("CreditsState")
 
     def setupMenu(self) -> None:
