@@ -19,7 +19,7 @@ class HelpUi:
         width, height = SCREEN_SIZE
         width *= 0.8
         height *= 0.2
-        self.surf = pygame.Surface((width, height))
+        self.surf = pygame.Surface((width, height), pygame.SRCALPHA)
         self.boxImage = pygame.image.load(resource_path('./res/HintTextbox.png')).convert_alpha()
         self.surf.blit(self.boxImage, pygame.Rect(0, 0, 80, 80))
 
@@ -345,7 +345,7 @@ class InGameState(State):
             return None
 
         return value
-    
+
     def resetCards(self) -> None:
         for slot in self.card_slots:
             if slot.card is not None and slot.cardUI is not None:
