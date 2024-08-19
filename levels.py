@@ -111,6 +111,10 @@ def validate_solution(level: Level, solution: list[Card]) -> bool:
         if a == '/' and b == '/':
             print(f'Two consecutive division found in solution: {solution[i].value}, {solution[i + 1].value}')
             return False
+        # This is to prevent multiplication becoming exposant
+        if a == '*' and b == '*':
+            print(f'Two consecutive division found in solution: {solution[i].value}, {solution[i + 1].value}')
+            return False
 
     return True
 
@@ -173,11 +177,14 @@ def preprocess_solution(solution: list[Card]) -> list[Card]:
     return processed_solution
 
 
-def evaluate_solution(level: Level, solution: list[Card]) -> float:
+def evaluate_solution(level: Level, solution: list[Card], world, game) -> float:
     is_valid = validate_solution(level, solution)
     if not is_valid:
         raise ValueError('Solution validation failed')
-
+    
+    if world == 4 and solution.__len__() > 11:
+        game.switchState('BlueScreenState')
+        return 0
     # Preprocess solution
     preprocessed_solution = preprocess_solution(solution)
 
@@ -212,14 +219,14 @@ if __name__ == '__main__':
         card_values = solution_str.replace(' ', '').split(',')
         cards = [Card(value) for value in card_values]
 
-        try:
-            value = evaluate_solution(level, cards)
-        except Exception as e:
-            print(e)
-            continue
+        #try:
+        #    value = evaluate_solution(level, cards)
+       # except Exception as e:
+        #    print(e)
+        #    continue
 
-        print(f'Result is: {value}')
+        #print(f'Result is: {value}')
 
-        running = value <= 2**level.nb_bits_to_overflow-1
+        #running = value <= 2**level.nb_bits_to_overflow-1
 
     print('You did it, gg!')
