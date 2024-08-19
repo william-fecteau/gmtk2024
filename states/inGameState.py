@@ -214,6 +214,8 @@ class InGameState(State):
         for event in self.game.events:
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.game.switchState("MenuState")
+            if event.type == pygame.KEYUP and event.key == pygame.K_r:
+                self.resetCards()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.handle_mouse_down()
             if event.type == pygame.MOUSEBUTTONUP:
@@ -315,7 +317,6 @@ class InGameState(State):
             pygame.mixer.Sound.play(self.level_clear)
 
         self.completed = true
-
     def go_next_level(self) -> None:
         max_worlds = get_max_worlds()
         max_levels = get_max_levels_per_world(self.current_world)
@@ -345,6 +346,14 @@ class InGameState(State):
             return None
 
         return value
+    
+    def resetCards(self) -> None:
+        for slot in self.card_slots:
+            if slot.card is not None and slot.cardUI is not None:
+                slot.setColor(DARK_GRAY)
+                slot.cardUI.setComebackPosition()
+                slot.card = None
+                slot.cardUI = None
 
     # ==============================================================================================================
     # Drawing
