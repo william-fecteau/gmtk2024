@@ -4,7 +4,7 @@ import pygame
 import sympy.core.numbers as spnumbers
 from sympy import false, true
 
-from constants import BLACK, DARK_GRAY, GREEN_COLOR, SCREEN_SIZE, TARGET_FPS, WORLD_COLORS
+from constants import BLACK, DARK_GRAY, GREEN_COLOR, SCREEN_SIZE, WORLD_COLORS
 from cutscenes.cutsceneManager import CutsceneManager
 from levels import Card, evaluate_solution, load_level
 from sand_simulathor.sand_simulator import SandSimulator
@@ -202,6 +202,7 @@ class InGameState(State):
         self.level_clear = pygame.mixer.Sound(resource_path('./res/Sfx_Level_clear.mp3'))
         self.next_world_sfx = pygame.mixer.Sound(resource_path('./res/NextWorldSFX.mp3'))
         self.cutsceneManager = CutsceneManager()
+        self.sandEnabled = True
 
 
     # ==============================================================================================================
@@ -219,6 +220,8 @@ class InGameState(State):
                 self.handle_mouse_down()
             if event.type == pygame.MOUSEBUTTONUP:
                 self.handle_mouse_up()
+            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                self.sandEnabled = not self.sandEnabled
 
         # Card dragging
         mouse_pos = pygame.mouse.get_pos()
@@ -314,10 +317,8 @@ class InGameState(State):
     def level_completed(self) -> None:
         if (not self.completed):
             pygame.mixer.Sound.play(self.level_clear)
-            self.updateSand = False
 
         self.completed = true
-        self.stopSandTimer -= 1
 
     def go_next_level(self) -> None:
         max_worlds = get_max_worlds()
@@ -370,10 +371,9 @@ class InGameState(State):
         else:
             overflow_ammount = 0.0
 
-        if (self.updateSand or self.stopSandTimer > 0):
+        if (self.sandEnabled):
             self.sand_ui.update()
-
-        self.sand_ui.draw(overflow_ammount, screen)
+            self.sand_ui.draw(overflow_ammount, screen)
 
         for card_slot in self.card_slots:
             card_slot.draw(screen)
@@ -494,8 +494,6 @@ class InGameState(State):
         if (self.cutsceneManager.queuedCutscene != payload.world):
             self.cutsceneManager.QueueCutscene(payload.world)
 
-        self.updateSand = True
-        self.stopSandTimer = 10 * TARGET_FPS
         self.help_ui = HelpUi(self.level.hint)
         self.sand_ui = SandUi(self.current_world)
 
