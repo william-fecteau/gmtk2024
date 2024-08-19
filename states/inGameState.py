@@ -338,9 +338,9 @@ class InGameState(State):
         for slot in self.card_slots:
             if slot.card is not None:
                 solutions.append(slot.card)
-
+        
         try:
-            value = evaluate_solution(self.level, solutions)  # type: ignore
+            value = evaluate_solution(self.level, solutions, self.current_world, self.game)  # type: ignore
         except Exception as e:
             return None
 

@@ -6,6 +6,7 @@ import pygame
 import utils
 from constants import SCREEN_SIZE, TARGET_FPS
 from states import CreditsState, InGameState, LevelSelectState, MenuState
+from states.blueScreenState import BlueScreenState
 
 
 class Game:
@@ -24,7 +25,8 @@ class Game:
             InGameState.__name__: InGameState(self),
             MenuState.__name__: MenuState(self),
             LevelSelectState.__name__: LevelSelectState(self),
-            CreditsState.__name__: CreditsState(self)
+            CreditsState.__name__: CreditsState(self),
+            BlueScreenState.__name__: BlueScreenState(self)
         }
         self.curState = MenuState.__name__
         self.nextState = None
