@@ -8,9 +8,9 @@ This project was made in 48h during the GMTK 2024 game jam.
 ## How to play the game
 
 ### Built binaries
-[Windows](https://github.com/william-fecteau/gmtk2024/releases/download/1.0/overflow-windows.exe) 
+[Windows](https://github.com/william-fecteau/gmtk2024/releases/download/1.0/overflow-windows.exe)
 
-[Linux](https://github.com/william-fecteau/gmtk2024/releases/download/1.0/overflow-linux) 
+[Linux](https://github.com/william-fecteau/gmtk2024/releases/download/1.0/overflow-linux)
 
 ### With python directly
 **Pre-requisite: Python 3.10**
@@ -53,7 +53,7 @@ MonkiBrain -  Programming, Card snaps, Optimisation
 
 02Zack - Programming, lots of UI
 
-PsychoPatt - Programming, cutscenes, bug fixes
+Psycho - Programming, cutscenes, bug fixes
 
 Th3Bos5 - Programming, Sand simulation
 
