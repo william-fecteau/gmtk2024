@@ -9,7 +9,7 @@ class SandSimulator:
 
         self.allelements = {}
 
-        self.MAX_X_VALUE_MAYBE = 64
+        self.MAX_X_VALUE_MAYBE = 65
         self.MAX_Y_VALUE_MAYBE = 36
 
         self.MAX_NUM_PARTICLES = self.MAX_X_VALUE_MAYBE * self.MAX_Y_VALUE_MAYBE
@@ -55,10 +55,10 @@ class SandSimulator:
 
     def draw_particles(self, overflow_ammount, surface):
         for element in list(self.allelements.keys()):
-            x = self.allelements[element].x
+            x = self.allelements[element].x - 1
             y = self.allelements[element].y
             self.allelements[element].draw(x, y, self.color)
-            
+
         if not self.is_init:
             self.init_sand_bucket(surface)
         if len(self.allelements) / self.MAX_NUM_PARTICLES * 100.0 < overflow_ammount:
