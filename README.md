@@ -11,7 +11,7 @@ This project was made in 48h during the GMTK 2024 game jam.
 Windows: 
 Linux: 
 
-### Build from source
+### With python directly
 **Pre-requisite: Python 3.10**
 
 1. Clone this repo
@@ -28,7 +28,22 @@ pip install -r requirements.txt
 python game.py
 ```
 
-### Meet the team
+### Building binaries
+
+**Pre-requisite: Follow all the steps from the last section to install the necessary dependencies**
+
+#### Windows
+```bash
+./build_windows.bat
+```
+
+#### Linux
+```bash
+chmod +x build_linux.bash
+./build_linux.bash
+```
+
+## Meet the team
 Parazytee - Level design, Music, Sound effects, Art
 
 AggroBane - Programming, Input parser, UI, fix monkiBrain's code
