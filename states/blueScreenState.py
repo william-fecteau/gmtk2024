@@ -9,7 +9,7 @@ class BlueScreenState (State):
 
     def __init__(self, game):
         super().__init__(game)
-        self.background = pygame.image.load(resource_path('./res/MenuImg/LevelBackground.png')).convert_alpha()
+        self.background = pygame.image.load(resource_path('./res/blueScreen.png')).convert_alpha()
 
 
     def draw(self, screen: pygame.Surface) -> None:
