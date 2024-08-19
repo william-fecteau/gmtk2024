@@ -181,7 +181,7 @@ def evaluate_solution(level: Level, solution: list[Card], world, game) -> float:
     is_valid = validate_solution(level, solution)
     if not is_valid:
         raise ValueError('Solution validation failed')
-    
+
     if world == 4 and solution.__len__() > 10:
         game.switchState('BlueScreenState')
         return 0
