@@ -453,11 +453,8 @@ class InGameState(State):
         self.help_ui.draw(screen)
 
     def draw_next(self, screen: pygame.Surface) -> None:
-        color = WORLD_COLORS.get(self.current_world, BLACK)
+        surf = pygame.Surface((150, 80), pygame.SRCALPHA)
 
-        surf = pygame.Surface((150, 80))
-
-        surf.fill(color)
         buttonImage = pygame.image.load(resource_path('./res/NextLevelButton.png'))
         surf.blit(buttonImage, pygame.Rect(0, 0, 150, 80))
 
