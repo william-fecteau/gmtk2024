@@ -190,7 +190,7 @@ def evaluate_solution(level: Level, solution: list[Card], world, game) -> float:
 
     expression = ''.join([card.value for card in preprocessed_solution])
     try:
-        value = sympy.simplify.combsimp.combsimp(sympify(expression)).evalf()
+        value = sympify(expression).evalf()
     except:
         raise ValueError(f'Sympy evaluation failed for expression: {expression}')
 

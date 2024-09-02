@@ -204,10 +204,10 @@ class InGameState(State):
         self.cutsceneManager = CutsceneManager()
         self.sandEnabled = True
 
-
     # ==============================================================================================================
     # Update
     # ==============================================================================================================
+
     def update(self) -> None:
         # Event handling
         self.last_mouse_move = pygame.mouse.get_rel()
@@ -521,7 +521,7 @@ class InGameState(State):
         self.next_button_rect = pygame.Rect(self.game.screen.get_rect().right - 200,
                                             self.game.screen.get_rect().bottom - 150, 150, 80)
 
-        pygame.mixer.music.load(resource_path('./res/MainThemeV3.mp3'))
+        pygame.mixer.music.load(resource_path('./res/MainThemeV4.mp3'))
         pygame.mixer.music.set_volume(0.35)
         pygame.mixer.music.play(-1)
         self.completed = false
