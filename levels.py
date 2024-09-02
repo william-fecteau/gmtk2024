@@ -190,7 +190,7 @@ def evaluate_solution(level: Level, solution: list[Card], world, game) -> float:
 
     expression = ''.join([card.value for card in preprocessed_solution])
     try:
-        value = sympify(expression).evalf()
+        value = sympy.simplify.combsimp.combsimp(sympify(expression)).evalf()
     except:
         raise ValueError(f'Sympy evaluation failed for expression: {expression}')
 
@@ -219,14 +219,14 @@ if __name__ == '__main__':
         card_values = solution_str.replace(' ', '').split(',')
         cards = [Card(value) for value in card_values]
 
-        #try:
+        # try:
         #    value = evaluate_solution(level, cards)
        # except Exception as e:
         #    print(e)
         #    continue
 
-        #print(f'Result is: {value}')
+        # print(f'Result is: {value}')
 
-        #running = value <= 2**level.nb_bits_to_overflow-1
+        # running = value <= 2**level.nb_bits_to_overflow-1
 
     print('You did it, gg!')
